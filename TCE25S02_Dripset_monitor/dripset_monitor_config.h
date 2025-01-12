@@ -2,6 +2,8 @@
 #ifndef DRIPSET_MONITOR_H
     #define DRIPSET_MONITOR_H
 
+    #define DRIPSET_MONITOR_STRING_LEN  32
+
     typedef enum DRIPSET_STATE
     {
         DRIPSET_STATE_OFF,
@@ -18,6 +20,28 @@
     }
     SENSOR_STATE;
 
+    typedef struct DRIPSET_PARAMS
+    {
+        /// @brief false if the dripset has been stopped
+        bool drip_running;
+
+        /// @brief the current flow rate of the dripset in drps per minute
+        uint8_t drip_flow_rate;
+
+        /// @brief the currently remaining quantity in milliliters of the fliud left in the bottle
+        uint8_t drip_volume_left;
+
+        /// @brief any message worthy to communicate to the user, it can even be an error message
+        char drip_msg[DRIPSET_MONITOR_STRING_LEN];
+    }
+    DRIPSET_PARAMS;
+
+    extern DRIPSET_PARAMS dripset_params;
+
+    /// @brief This function sets the current flow rate of the dripset
+    /// @retval SENSOR_STATE_READY if the value is valid and set successfully
+    /// @retval SENSOR_STATE_BUSY if there is pending conversion before the value can be set
+    /// @retval SENSOR_STATE_ERROR if the required value can't be set for some reason
     SENSOR_STATE infrared_SetRate( void );
 
     /// @brief Initialize the infrared sensor used for determining flow rate 
