@@ -6,8 +6,17 @@
 
     typedef enum DRIPSET_STATE
     {
-        DRIPSET_STATE_OFF,
-        DRIPSET_STATE_ERROR
+        /// @brief when dripping stopped by the user
+        DRIP_STATE_OFF,
+
+        /// @brief When running normally and the rate is within the limits
+        DRIP_STATE_DRIPPING,
+
+        /// @brief when stopped by the system due to set limits in the parameters
+        DRIP_STATE_STOPPED,
+
+        /// @brief when there is error state, could be sensor failure or out of range parameters
+        DRIP_STATE_ERROR
     }
     DRIPSET_STATE;
 
