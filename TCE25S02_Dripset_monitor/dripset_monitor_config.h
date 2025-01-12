@@ -6,6 +6,9 @@
 
     typedef enum DRIPSET_STATE
     {
+        /// @brief when still getting stuff ready
+        DRIP_STATE_INIT,
+
         /// @brief when dripping stopped by the user
         DRIP_STATE_OFF,
 
@@ -22,10 +25,9 @@
 
     typedef enum SENSOR_STATE
     {
-        SENSOR_STATE_INIT,
+        SENSOR_STATE_ERROR,
         SENSOR_STATE_BUSY,
-        SENSOR_STATE_READY,
-        SENSOR_STATE_ERROR
+        SENSOR_STATE_READY
     }
     SENSOR_STATE;
 
@@ -56,7 +58,6 @@
     /// @brief Initialize the infrared sensor used for determining flow rate 
     /// @param sensor_pin the pin number on which the sensor is connected
     /// @retval SENSOR_STATE_READY if the initilisation is complete
-    /// @retval SENSOR_STATE_INIT if initialisation is still ongoing
     /// @retval SENSOR_STATE_ERROR if the sensor can't be set up
     SENSOR_STATE infrared_Init( uint8_t sensor_pin );
 
@@ -64,7 +65,6 @@
     /// @param sda_pin data pin of the load sensor
     /// @param sck_pin clock pin of the load sensor
     /// @retval SENSOR_STATE_READY if the initilisation is complete
-    /// @retval SENSOR_STATE_INIT if initialisation is still ongoing
     /// @retval SENSOR_STATE_ERROR if the sensor can't be set up
     /// @note This load sensor uses the hx711 drivers
     SENSOR_STATE load_cell_Init( uint8_t sda_pin, uint8_t sck_pin );
@@ -74,5 +74,9 @@
     /// @retval SENSOR_STATE_BUSY if there is pending conversion before the value can be set
     /// @retval SENSOR_STATE_ERROR if the required value can't be set for some reason
     SENSOR_STATE load_cell_SetVolume( void );
+
+    void motor_Init( void );
+    bool motor_OpenFlow( void );
+    bool motor_CloseFlow( void );
 
 #endif
