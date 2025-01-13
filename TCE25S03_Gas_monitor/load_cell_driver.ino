@@ -16,7 +16,7 @@ SENSOR_STATE load_cell_Init( uint8_t sda_pin, uint8_t sck_pin )
     }
 }
 
-SENSOR_STATE load_cell_SetVolume( void )
+DEVICE_STATE load_cell_SetVolume( void )
 {
     // This function should be non blocking, it should return BUSY in case conversion is still ongoing
     unsigned long previousMillis = 0;
@@ -32,9 +32,9 @@ SENSOR_STATE load_cell_SetVolume( void )
     currentMillis = millis();
     if(currentMillis - previousMillis == period){
       scale.power_up();
-      return SENSOR_STATE_READY;
+      return DEVICE_STATE_READY;
     }
     else{
-      return SENSOR_STATE_BUSY;
+      return DEVICE_STATE_BUSY;
     }
 }
