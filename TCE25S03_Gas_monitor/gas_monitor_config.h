@@ -2,19 +2,14 @@
 #ifndef GAS_MONITOR_H
   #define GAS_MONITOR_H
 
-  #define strlen 16
-  #define threshold = 400;
+  #define strlen    16
+  #define threshold 400
 
   typedef enum SENSOR_STATE{
-        DEVICE_STATE_ERROR,
-        DEVICE_STATE_BUSY,
-        DEVICE_STATE_READY
+        SENSOR_STATE_ERROR,
+        SENSOR_STATE_BUSY,
+        SENSOR_STATE_READY
   } DEVICE_STATE;
-
-  typedef enum LCD_STATE{
-        LCD_READY,
-        LCD_ERROR
-  }LCD_STATE;
 
   typedef struct DEVICE_PARAMS{
     char message[strlen];
@@ -22,14 +17,13 @@
     float weight;
   }DEVICE_PARAMS;
 
+  SENSOR_STATE sensor_state;
   DEVICE_PARAMS device_params;
 
-  SENSOR_STATE load_cell_Init(uint8_t LOAD_CELL_SDA_PIN, uint8_t LOAD_CELL_SCK_PIN);
-  SENSOR_STATE load_cell_SetVolume( void );
-  DEVICE_STATE display_setup();
-  void motor_Init( void );
-  bool motor_OpenFlow( void );
-  bool motor_CloseFlow( void );
-  void display_clear();
+  bool load_cell_Init(uint8_t sda_pin, uint8_t sck_pin);
+  SENSOR_STATE load_cell_SetVolume(void);
+  void motor_Init(uint8_t motor_pin);
+  bool motor_OpenFlow(void);
+  bool motor_CloseFlow(void);
 
 #endif
