@@ -32,6 +32,8 @@ bool motor_CloseFlow( void )
 
     if(curr_position > CLOSED_POSITION)
     {
+        lcd.setCursor(0,1);
+        lcd.print("TURNING GAS KNOB");
         gas_motor.write(curr_position - 1);
     }
 

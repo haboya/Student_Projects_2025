@@ -1,5 +1,4 @@
 
-
 #include "gas_monitor_config.h"
 #include <Wire.h>
 #include <LiquidCrystal_PCF8574.h>
@@ -8,11 +7,9 @@
 
 LiquidCrystal_PCF8574 lcd(0x27);
 
-// DEVICE_PARAMS display_params;
-
 unsigned long display_time;
 
-DEVICE_STATE display_setup()
+LCD_STATE display_setup()
 {
     #ifdef DEVICE_DEBUG
         Serial.println("display setup");
@@ -24,24 +21,20 @@ DEVICE_STATE display_setup()
 
     if(error != 0)
     {
-        return DEVICE_STATE_ERROR;
+        return LCD_ERROR;
     }
 
     lcd.begin(16, 2);
     lcd.setBacklight(255);
     lcd.display();
 
-    return DEVICE_STATE_READY;
+    return LCD_READY;
 }
 
 void display_clear(){
     lcd.clear();
     lcd.setBacklight(0);
     lcd.noDisplay();
-}
-
-void display_update( ){
-  
 }
 
 

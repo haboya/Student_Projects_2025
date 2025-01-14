@@ -16,25 +16,26 @@ SENSOR_STATE load_cell_Init( uint8_t sda_pin, uint8_t sck_pin )
     }
 }
 
-DEVICE_STATE load_cell_SetVolume( void )
+SENSOR_STATE load_cell_SetVolume( void )
 {
-    // This function should be non blocking, it should return BUSY in case conversion is still ongoing
+   
     unsigned long previousMillis = 0;
     unsigned long currentMillis;
     unsigned const long period = 5000;
 
     Serial.print("one reading:\t");
-    Serial.print(scale.get_units(), 1);
-    Serial.print("\t| average:\t");
-    Serial.println(scale.get_units(10), 1);
+    device_params.weight = scale.get_units();
+    Serial.print(device_params.weight, 1);
+    // Serial.print("\t| average:\t");
+    // Serial.println(scale.get_units(10), 1);
 
-    scale.power_down();			        // put the ADC in sleep mode
+    scale.power_down();
     currentMillis = millis();
     if(currentMillis - previousMillis == period){
       scale.power_up();
-      return DEVICE_STATE_READY;
+      return SENSOR_STATE_READY;
     }
     else{
-      return DEVICE_STATE_BUSY;
+      return SENSOR_STATE_BUSY;
     }
 }
