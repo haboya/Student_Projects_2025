@@ -24,8 +24,8 @@ void setup(){
 void loop(){
     SENSOR_STATE load_cell_SetVolume();
     device_params.sensor_value = analogRead(gas_sensor_pin);
+    Serial.println(device_params.sensor_value);
     if (device_params.sensor_value > threshold) {
-      lcd.clear();
       lcd.setCursor(0,0);
       lcd.print("LEAK DETECTED");
       lcd.setCursor(0,1);
@@ -53,6 +53,7 @@ bool device_setup(){
   }
 
   motor_Init(servo_motor_pin);
+  delay(200);
   return true;
 }
 

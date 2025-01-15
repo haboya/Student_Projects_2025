@@ -2,8 +2,7 @@
 #ifndef GAS_MONITOR_H
   #define GAS_MONITOR_H
 
-  #define strlen    16
-  #define threshold 400
+  #define threshold 200
 
   typedef enum SENSOR_STATE{
         SENSOR_STATE_ERROR,
@@ -12,7 +11,6 @@
   } DEVICE_STATE;
 
   typedef struct DEVICE_PARAMS{
-    char message[strlen];
     int sensor_value;
     float weight;
   }DEVICE_PARAMS;
