@@ -10,37 +10,24 @@ Servo gas_motor;
 void motor_Init(uint8_t motor_pin){
     gas_motor.attach(motor_pin);
     Serial.println("motor: ");
-    // Serial.print(gas_motor.read());
+    gas_motor.write(OPENED_POSITION);
 }
 
-bool motor_OpenFlow( void ){
+bool read_gas_hose_status(){
     int curr_position = gas_motor.read();
     Serial.println("current motor position: ");
     Serial.print(curr_position);
-    if(curr_position >= OPENED_POSITION) return true;
-
-    if(curr_position < OPENED_POSITION)
-    {
-        gas_motor.write(curr_position + 1);
+    if(curr_position >= OPENED_POSITION){
+      return false;
     }
-
-    return false;
+    else{
+      return true;
+    }
 }
 
-bool motor_CloseFlow( void ){
-    int curr_position = gas_motor.read();
-
-    Serial.println("current motor position: ");
-    Serial.print(curr_position);
-
-    if(curr_position <= CLOSED_POSITION) return true;
-
-    if(curr_position > CLOSED_POSITION)
-    {
-        lcd.setCursor(0,1);
-        lcd.print("TURNING GAS KNOB");
+void motor_CloseFlow( void ){
+      int curr_position = gas_motor.read();
+      for(int i=0; i<=CLOSED_POSITION; I++){
         gas_motor.write(curr_position - 1);
-    }
-
-    return false;
+      }
 }
