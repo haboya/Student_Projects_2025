@@ -59,7 +59,7 @@
     /// @param sensor_pin the pin number on which the sensor is connected
     /// @retval SENSOR_STATE_READY if the initilisation is complete
     /// @retval SENSOR_STATE_ERROR if the sensor can't be set up
-    SENSOR_STATE infrared_Init( uint8_t sensor_pin );
+    bool infrared_Init( uint8_t sensor_pin );
 
     /// @brief Initialize the load cell sensor 
     /// @param sda_pin data pin of the load sensor
@@ -75,7 +75,7 @@
     /// @retval SENSOR_STATE_ERROR if the required value can't be set for some reason
     SENSOR_STATE load_cell_SetVolume( void );
 
-    void motor_Init( void );
+    bool motor_Init( void );
     bool motor_OpenFlow( void );
     bool motor_CloseFlow( void );
 

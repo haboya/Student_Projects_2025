@@ -2,43 +2,41 @@
 #include "dripset_monitor_config.h"
 
 volatile uint8_t dropCount;
-bool watch;
+unsigned long lastMillis = 0;
+// bool watch;
 
-SENSOR_STATE infrared_Init( uint8_t sensor_pin )
+bool infrared_Init( uint8_t sensor_pin )
 {
     pinMode(sensor_pin, INPUT);
-    attachInterrupt(digitalPinToInterrupt(sensor_pin), drops_count, FALLING);
-    watch = true;
+    attachInterrupt(digitalPinToInterrupt(sensor_pin), drops_count, RISING);
+    Serial.println("infrared");
+    return true;
 }
 
 SENSOR_STATE infrared_SetRate( void )
 {
-    if(watch){
       unsigned long currentMillis = millis();
       
-      // Calculate drops per minute every interval, 60000 is the equivqlent of a min in millis
-      if (currentMillis - lastMillis >= 10000) {
-        noInterrupts(); //turn interrupts off for the moment
-        int drip_flow_rate = dropCount * 6;
+      if (currentMillis - lastMillis >= 1000){
+        noInterrupts();
+        dripset_params.drip_flow_rate = dropCount;
         dropCount = 0;
         interrupts();
 
-        Serial.print("Drops per minute: ");
-        Serial.println(drip_flow_rate);
+        Serial.print("Drops per second: ");
+        Serial.println(dripset_params.drip_flow_rate);
 
         lastMillis = currentMillis;
+       
       }
-      
-      return SENSOR_STATE_READY;
-    }
-
-    else{
-      watch = false;
-      return SENSOR_STATE_ERROR;
-    }
+      // else{
+      //   return SENSOR_STATE_BUSY;
+      // }
+       return SENSOR_STATE_READY;
 }
 
-ICACHE_RAM_ATTR drops_count(){
+ICACHE_RAM_ATTR void drops_count(){
   dropCount++;
+  Serial.println(dropCount);
 }
 /* ----------------------------------- EOF ---------------------------------- */

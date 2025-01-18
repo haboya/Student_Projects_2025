@@ -6,6 +6,7 @@
 #define LOAD_CELL_SCK_PIN           D2
 #define LOAD_CELL_SDA_PIN           D1
 #define NOTIFICATION_INTERVAL_SECS  1
+#define MOTOR_PIN                   D5
 
 #define CUTOFF_VOLUME               100
 #define MINIMUM_FLOW_RATE           10
@@ -37,35 +38,53 @@ void setup()
     
     //init buzzer
     pinMode(BUZZER_PIN, OUTPUT);
-    SENSOR_STATE infrared_state = SENSOR_STATE_BUSY;
+    // SENSOR_STATE infrared_state = SENSOR_STATE_BUSY;
 
-    do{
-        infrared_state = infrared_Init(INFRARED_PIN);
-    }
-    while(infrared_state == SENSOR_STATE_BUSY);
+    // if(infrared_Init(INFRARED_PIN)){
+    //   Serial.println("infrared innitialised");
+    // }
+    // else{
+    //   dripset_state = DRIP_STATE_ERROR;
+    // }
 
-    SENSOR_STATE loadcell_state = SENSOR_STATE_BUSY;
-    do{
-        loadcell_state = load_cell_Init(LOAD_CELL_SDA_PIN,LOAD_CELL_SCK_PIN);
-    }
-    while(loadcell_state == SENSOR_STATE_BUSY);
+    // if(load_cell_Init(LOAD_CELL_SDA_PIN,LOAD_CELL_SCK_PIN)){
+    //   Serial.println("load cell done");
+    // }
+    // else{
+    //   dripset_state = DRIP_STATE_ERROR;
+    // }
 
-    if(infrared_state == SENSOR_STATE_ERROR || loadcell_state == SENSOR_STATE_ERROR)
-    {
-        dripset_state = DRIP_STATE_ERROR;
+    if(infrared_Init(INFRARED_PIN)){
+      if(load_cell_Init(LOAD_CELL_SDA_PIN,LOAD_CELL_SCK_PIN)){
+        if(motor_Init(MOTOR_PIN)){
+          Serial.println("innitialisation complete");
+      // dripset_state = DRIP_STATE_OFF;
+        }
+      }
     }
-    else
-    {
-        dripset_state  = DRIP_STATE_OFF;
+    else{
+      Serial.println("check peripherals");
+      dripset_state = DRIP_STATE_ERROR;
     }
 
+    sensor_state = infrared_SetRate();
+    if(sensor_state == SENSOR_STATE_READY){
+      Serial.println("infrared is ready");
+    }
+
+    delay(1000);
 }
 
 void loop()
 {
-    if((load_cell_SetVolume() == SENSOR_STATE_ERROR) || (infrared_SetRate() == SENSOR_STATE_ERROR))
-    {
-        dripset_state = DRIP_STATE_ERROR;
+     sensor_state = infrared_SetRate();
+
+    if(dripset_params.drip_flow_rate == 0 && sensor_state == SENSOR_STATE_READY){  //add a condition to check if the load sensor is reading a max value
+        dripset_state = DRIP_STATE_OFF;
+        Serial.println("Drip off");
+    }
+    else if(dripset_params.drip_flow_rate > 0){
+      dripset_state = DRIP_STATE_DRIPPING;
     }
 
     switch( dripset_state)
@@ -73,6 +92,7 @@ void loop()
         case DRIP_STATE_OFF:
         {
             motor_OpenFlow();
+            Serial.println("drip state off; turn flow on");
             beepBuzzer(6);
             if(dripset_params.drip_flow_rate > 0)
             {
@@ -83,6 +103,7 @@ void loop()
 
         case DRIP_STATE_DRIPPING:
         {
+            Serial.println("drip state dripping, turn it off");
             if(dripset_params.drip_flow_rate == 0)
             {
                 dripset_state = DRIP_STATE_OFF;
@@ -119,4 +140,6 @@ void loop()
             break;
         }
     }
+
+    delay(1000);
 }

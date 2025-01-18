@@ -7,9 +7,11 @@
 
 Servo flow_motor;
 
-void motor_Init( uint8_t motor_pin )
+bool motor_Init( uint8_t motor_pin )
 {
     flow_motor.attach(motor_pin);
+    Serial.println("motor");
+    return true;
 }
 
 bool motor_OpenFlow( void )
