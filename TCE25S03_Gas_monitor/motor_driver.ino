@@ -27,7 +27,7 @@ bool read_gas_hose_status(){
 
 void motor_CloseFlow( void ){
       int curr_position = gas_motor.read();
-      for(int i=0; i<=CLOSED_POSITION; I++){
-        gas_motor.write(curr_position - 1);
+      for(curr_position; curr_position>=CLOSED_POSITION; curr_position--){
+        gas_motor.write(curr_position);
       }
 }
