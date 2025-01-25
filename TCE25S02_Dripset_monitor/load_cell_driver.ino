@@ -38,3 +38,12 @@ SENSOR_STATE load_cell_SetVolume( void )
       return SENSOR_STATE_BUSY;
     }
 }
+
+void get_liquid_level(){
+  for (int i = 0; i < weights_number; i++) {
+    if (dripset_params.drip_volume_left >= weights[i]) {
+      return calibrationData[i]; // return the corresponding liquid level
+    }
+  }
+  return 0;
+}

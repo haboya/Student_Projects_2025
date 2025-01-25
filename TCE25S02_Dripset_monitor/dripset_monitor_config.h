@@ -3,6 +3,10 @@
     #define DRIPSET_MONITOR_H
 
     #define DRIPSET_MONITOR_STRING_LEN  32
+    #define DRIPSET_IOT_UPDATE_INTERVAL 1
+    #define weights_number              5
+
+    int weights[weights_number] = { };  //add weights
 
     typedef enum DRIPSET_STATE
     {
@@ -74,9 +78,18 @@
     /// @retval SENSOR_STATE_BUSY if there is pending conversion before the value can be set
     /// @retval SENSOR_STATE_ERROR if the required value can't be set for some reason
     SENSOR_STATE load_cell_SetVolume( void );
+    /// @brief Setup connection with the IOT platform 
+    /// @return false if the connection fails
+    bool iot_Init( void );
 
-    void motor_Init( void );
-    bool motor_OpenFlow( void );
-    bool motor_CloseFlow( void );
+    /// @brief keep update with the IOT platform 
+    /// @return true at every sucessive data upload
+    bool iot_UpdateStatus( void );
+
+    bool motor_Init( void );
+    void motor_OpenFlow( void );
+    void motor_CloseFlow( void );
+    // bool motor_OpenFlow( void );
+    // bool motor_CloseFlow( void );
 
 #endif
