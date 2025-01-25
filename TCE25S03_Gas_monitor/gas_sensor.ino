@@ -34,14 +34,16 @@ SENSOR_STATES gas_sensor_GetState(void)
 
     if(average >= TRIGGER_THRESHOLD)
     {
+        device_params.gas_status = true;
         return SENSOR_STATE_ERROR;
     }
-    else if(average > NORMAL_HIGH)
+    else if((average > NORMAL_HIGH) && (device_params.gas_status == true))
     {
         return SENSOR_STATE_BUSY;
     }
     else if(average >= NORMAL_LOW)
     {
+        device_params.gas_status = false;
         return SENSOR_STATE_READY;
     }
 

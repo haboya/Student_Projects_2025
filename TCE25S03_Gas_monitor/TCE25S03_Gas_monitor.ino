@@ -83,7 +83,7 @@ void setup()
         curr_device_state = DEVICE_ERROR;
     }
 
-    delay(2000);
+    iot_Init();
 }
 
 void loop(){
@@ -186,26 +186,31 @@ void loop(){
         lcd.print(lcd_row2);
     }
 
-    switch(curr_device_state){
-      case DEVICE_INIT:
-      beepBuzzer(8);
-      break;
+    switch(curr_device_state)
+    {
+        //
+        case DEVICE_INIT:
+        case NO_GAS_DETECTED:
+            //check button
+        break;
 
-      case NO_GAS_DETECTED:
-        beepBuzzer(20);
-      break;
+        case GAS_DETECTED:
+            beepBuzzer(1);
+            motor_CloseFlow();
+        break;
 
-      case GAS_DETECTED:
-        beepBuzzer(1);
-      break;
+        case GAS_WEIGHT_LOW:
+            beepBuzzer(3);
+            motor_CloseFlow();
+        break;
 
-      case GAS_WEIGHT_LOW:
-        beepBuzzer(4);
-      break;
-
-      case DEVICE_ERROR:
-        beepBuzzer(2);
+        case DEVICE_ERROR:
+            beepBuzzer(2);
+            motor_CloseFlow();
+        break;
     }
     
+    iot_UpdateStatus();
+
     delay(10);
 }

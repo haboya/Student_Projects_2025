@@ -29,7 +29,8 @@
   }DEVICE_STATES;
 
   typedef struct DEVICE_PARAMS{
-    int sensor_value;
+    bool motor_status;
+    bool gas_status;
     WEIGHT_SIZES current_weight;
   }DEVICE_PARAMS;
 
@@ -48,5 +49,9 @@
   void motor_Init(uint8_t motor_pin);
   bool read_gas_hose_status( void );
   void motor_CloseFlow( void );
+  void motor_OpenFlow( void );
+
+  bool iot_Init( void );
+  bool iot_UpdateStatus( void );
 
 #endif

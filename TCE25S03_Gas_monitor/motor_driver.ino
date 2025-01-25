@@ -10,7 +10,7 @@ Servo gas_motor;
 void motor_Init(uint8_t motor_pin){
     gas_motor.attach(motor_pin);
     Serial.println("motor: ");
-    gas_motor.write(OPENED_POSITION);
+    motor_CloseFlow();
 }
 
 bool read_gas_hose_status(){
@@ -26,8 +26,18 @@ bool read_gas_hose_status(){
 }
 
 void motor_CloseFlow( void ){
-      int curr_position = gas_motor.read();
-      for(curr_position; curr_position>=CLOSED_POSITION; curr_position--){
-        gas_motor.write(curr_position);
-      }
+    int curr_position = gas_motor.read();
+    for(curr_position; curr_position>=CLOSED_POSITION; curr_position--){
+      gas_motor.write(curr_position);
+    }
+    device_params.motor_status = true;
+}
+
+void motor_OpenFlow( void ){
+    int curr_position = gas_motor.read();
+    for(curr_position; curr_position>=CLOSED_POSITION; curr_position--){
+      gas_motor.write(curr_position);
+    }
+
+    device_params.motor_status = false;
 }
