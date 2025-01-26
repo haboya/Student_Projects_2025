@@ -1,86 +1,71 @@
 
 #include "gas_monitor_config.h"
 #include <Wire.h> 
-#include <LiquidCrystal_I2C.h>
-#include <Servo.h>
 
-
-#define MOTOR_PIN             D6
-#define gas_sensor_pin              A0
-#define button                      D5
-#define buzzer_pin                  D7
-
+#define DEBUG_DEVICE_STATES
 DEVICE_PARAMS device_params;
 DEVICE_STATES curr_device_state;
-LiquidCrystal_I2C lcd(0x27,16,2);
-char lcd_row1[17] = {0};
-char lcd_row2[17] = {0};
-unsigned long disp_millis;
-bool lcd_setRowMsg( uint8_t row_num, char *row_msg)
-{
-    if(strlen(row_msg) > 16)
-    {
-        return false;
-    }
-    if(row_num == 1)
-    {
-        memset(lcd_row1, '\0', 17);
-        sprintf(lcd_row1, "%s", row_msg);
-        return true;
-    }
-    else if(row_num == 2)
-    {
-        memset(lcd_row2, '\0', 17);
-        sprintf(lcd_row2, "%s", row_msg);
-        return true;
-    }
-    
-    return false;
-}
 
 void beepBuzzer( uint8_t buzzer_rate_500ms)
 {
     static unsigned long buzzer_millis = 0;
     if(millis() - buzzer_millis > buzzer_rate_500ms*500)
     {
-        tone(buzzer_pin, 4000, 150);
+        tone(BUZZER_PIN, 4000, 150);
         buzzer_millis = millis();
     }
 }
 
 bool device_setup()
 {
-  pinMode(gas_sensor_pin, INPUT);
-  pinMode(button, INPUT);
-  pinMode(buzzer_pin, OUTPUT);
+    lcd_Init();
+    button_Init(BUTTON_PIN);
+    gas_sensor_Init(GAS_SENSOR_PIN);
 
-  lcd.init();
-  lcd.backlight();
-  lcd.setCursor(0,0);
-  lcd.print("INNITIALIZING...");
-
-  motor_Init(MOTOR_PIN);
-  delay(1000);
-  lcd.setCursor(0, 1);
-  if(load_cell_Init(LOAD_CELL_SDA_PIN, LOAD_CELL_SCK_PIN) == SENSOR_STATE_ERROR){
-    lcd.print("load cell error");
-    return false;
-  }
+    motor_Init(MOTOR_PIN);
+    delay(1000);
+    if(load_cell_Init(LOAD_CELL_SDA_PIN, LOAD_CELL_SCK_PIN) == SENSOR_STATE_ERROR)
+    {
+            lcd_setRowMsg(2, "load cell error");
+            return false;
+    }
   
-  lcd.print("load cell ready");
-  return true;
+    lcd_setRowMsg(2, "load cell ready");
+    return true;
+}
+
+bool set_DeviceState(DEVICE_STATES new_state)
+{
+    if(curr_device_state == new_state) return false;
+
+    #ifdef DEBUG_DEVICE_STATES
+        Serial.print("Device State Changed from: ");
+        Serial.print(curr_device_state);
+        Serial.print(" to: ");
+        Serial.println(new_state);
+    #endif
+    curr_device_state = new_state;
+    return true;
 }
 
 void setup()
 {
-    curr_device_state = DEVICE_INIT;
+    set_DeviceState(DEVICE_INIT);
     Serial.begin(115200);
+    
+    pinMode(BUZZER_PIN, OUTPUT);
+
+    beepBuzzer(1);
     bool device_ready = device_setup();
     beepBuzzer(1);
+    lcd_Update();
     
     if(!device_ready)
     {
-        curr_device_state = DEVICE_ERROR;
+        #ifdef DEBUG_DEVICE_STATES
+            Serial.println("Device Error");
+        #endif
+        set_DeviceState(DEVICE_ERROR);
     }
 
     iot_Init();
@@ -97,42 +82,42 @@ void loop(){
                 case TOP_FULL:
                 {
                     lcd_setRowMsg(1, "GAS CAN FULL");
-                    curr_device_state = GAS_WEIGHT_LOW;
+                    set_DeviceState(NO_GAS_DETECTED);
                     break;
                 }
 
                 case GETTING_FULL:
                 {
                     lcd_setRowMsg(1, "GAS ALMOST FULL");
-                    curr_device_state = GAS_WEIGHT_LOW;
+                    set_DeviceState(NO_GAS_DETECTED);
                     break;
                 }
 
                 case HALF_FULL:
                 {
                     lcd_setRowMsg(1, "GAS HALF FULL");
-                    curr_device_state = NO_GAS_DETECTED;
+                    set_DeviceState(NO_GAS_DETECTED);
                     break;
                 }
 
                 case RUNNING_OUT:
                 {
                     lcd_setRowMsg(1, "GAS RUNNING LOW");
-                    curr_device_state = GAS_WEIGHT_LOW;
+                    set_DeviceState(GAS_WEIGHT_LOW);
                     break;
                 }
 
                 case EMPTY_CAN:
                 {
                     lcd_setRowMsg(1, "GAS CAN EMPTY");
-                    curr_device_state = GAS_WEIGHT_LOW;
+                    set_DeviceState(GAS_WEIGHT_LOW);
                     break;
                 }
 
                 case NO_CAN:
                 {
                     lcd_setRowMsg(1, "PLACE GAS CAN");
-                    curr_device_state = GAS_WEIGHT_LOW;
+                    set_DeviceState(GAS_WEIGHT_LOW);
                     break;
                 }
             }
@@ -147,7 +132,11 @@ void loop(){
 
         case SENSOR_STATE_ERROR:
         {
-            curr_device_state = DEVICE_ERROR;
+            #ifdef DEBUG_DEVICE_STATES
+                Serial.println("Sensor Error");
+            #endif
+            lcd_setRowMsg(1, "SENSOR ERROR!!!");
+            set_DeviceState(DEVICE_ERROR);
             break;
         }
     }
@@ -164,34 +153,48 @@ void loop(){
         {
             if(curr_device_state == NO_GAS_DETECTED)
             {
-                curr_device_state = DEVICE_INIT;
+                set_DeviceState(DEVICE_INIT);
             }
             lcd_setRowMsg(2, "SENSOR INIT...");
             break;
         }
+        
         case SENSOR_STATE_ERROR:
         {
-            curr_device_state = GAS_DETECTED;
+            set_DeviceState(GAS_DETECTED);
             lcd_setRowMsg(1, " GAS DETECTED!! ");
             break;
         }
     }
     
-    if(millis() - disp_millis > 800)
-    {
-        disp_millis = millis();
-        lcd.clear();
-        lcd.print(lcd_row1);
-        lcd.setCursor(0,1);
-        lcd.print(lcd_row2);
-    }
+    lcd_Update();
 
     switch(curr_device_state)
     {
         //
         case DEVICE_INIT:
         case NO_GAS_DETECTED:
-            //check button
+            //check BUTTON_PIN
+            if(button_GetState())
+            {
+                #ifdef DEBUG_DEVICE_STATES
+                    Serial.println("Button Pressed");
+                #endif
+                if(device_params.motor_status)
+                {
+                    #ifdef DEBUG_DEVICE_STATES
+                        Serial.println("Opening Flow");
+                    #endif
+                    motor_OpenFlow();
+                }
+                else
+                {
+                    #ifdef DEBUG_DEVICE_STATES
+                        Serial.println("Closing Flow");
+                    #endif
+                    motor_CloseFlow();
+                }
+            }
         break;
 
         case GAS_DETECTED:

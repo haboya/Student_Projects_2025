@@ -26,11 +26,12 @@ SENSOR_STATES load_cell_SetVolume( void )
 {
     if(millis() - lc_millis > 1000)
     {
+        lc_millis = millis();
+        
         if (scale.is_ready()) 
         {
           long reading = scale.read()/1000;
-          // Serial.print("HX711 reading: ");
-          // Serial.println(reading);
+
           if(reading >= TOP_FULL_VAL)
           {
               device_params.current_weight = TOP_FULL;
@@ -60,11 +61,8 @@ SENSOR_STATES load_cell_SetVolume( void )
         } 
         else 
         {
-          // Serial.println("HX711 not found.");
             return SENSOR_STATE_ERROR;
         }
-
-        lc_millis = millis();
     }
     
     return SENSOR_STATE_BUSY;

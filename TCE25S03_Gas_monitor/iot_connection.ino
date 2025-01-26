@@ -3,6 +3,7 @@
 #include <ESP8266WiFi.h>
 #include <ThingSpeak.h>
 
+#define IOT_UPDATE_INTERVAL 3
 const char* ssid = "PowerUP_Lab";
 const char* password = "#powerup2"; 
 

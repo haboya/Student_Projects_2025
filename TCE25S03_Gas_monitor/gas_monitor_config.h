@@ -1,9 +1,12 @@
 
 #ifndef GAS_MONITOR_H
   #define GAS_MONITOR_H
-  #define LOAD_CELL_SCK_PIN           D3
-  #define LOAD_CELL_SDA_PIN           D4
-  #define threshold 200
+  #define LOAD_CELL_SCK_PIN     D3
+  #define LOAD_CELL_SDA_PIN     D4
+  #define BUTTON_PIN            D5
+  #define MOTOR_PIN             D6
+  #define BUZZER_PIN            D7
+  #define GAS_SENSOR_PIN        A0
 
   typedef enum SENSOR_STATES{
         SENSOR_STATE_ERROR,
@@ -54,4 +57,10 @@
   bool iot_Init( void );
   bool iot_UpdateStatus( void );
 
+  bool lcd_Init( void );
+  bool lcd_setRowMsg( uint8_t row_num, char *row_msg);
+  void lcd_Update( void );
+
+  void button_Init(uint8_t btn_pin);
+  bool button_GetState( void );
 #endif
