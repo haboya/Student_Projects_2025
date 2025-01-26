@@ -43,9 +43,12 @@
 
         /// @brief the current flow rate of the dripset in drps per minute
         uint8_t drip_flow_rate;
+        uint8_t minimum_flow_rate;
+        uint8_t maximum_flow_rate;
 
         /// @brief the currently remaining quantity in milliliters of the fliud left in the bottle
         uint8_t drip_volume_left;
+        uint16_t cutoff_volume;
 
         /// @brief any message worthy to communicate to the user, it can even be an error message
         char drip_msg[DRIPSET_MONITOR_STRING_LEN];
@@ -89,7 +92,7 @@
     /// @return true at every sucessive data upload
     bool iot_UpdateStatus( void );
 
-    void motor_Init( void );
+    void motor_Init(uint8_t motor_pin);
     void motor_OpenFlow( void );
     void motor_CloseFlow( void );
 

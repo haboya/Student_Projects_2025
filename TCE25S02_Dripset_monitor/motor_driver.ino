@@ -20,7 +20,6 @@ void motor_CloseFlow( void )
       drip_motor.write(curr_position);
       delay(15);
     }
-    dripset_params.drip_running = false;
 }
 
 void motor_OpenFlow( void )
@@ -30,6 +29,4 @@ void motor_OpenFlow( void )
       drip_motor.write(curr_position);
       delay(15);
     }
-
-    dripset_params.drip_running = true;
 }

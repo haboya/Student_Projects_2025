@@ -10,6 +10,21 @@ BlynkTimer timer;
 
 bool iot_data_sent = false;
 
+BLYNK_WRITE(V3)
+{
+    dripset_params.cutoff_volume = param.asInt();
+}
+
+BLYNK_WRITE(V4)
+{
+    dripset_params.minimum_flow_rate = param.asInt();
+}
+
+BLYNK_WRITE(V5)
+{
+    dripset_params.maximum_flow_rate = param.asInt();
+}
+
 void iot_sendData( void )
 {
     Blynk.virtualWrite(V0, dripset_params.drip_running);

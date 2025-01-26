@@ -4,14 +4,14 @@
 volatile uint8_t dropCount;
 bool watch;
 
-SENSOR_STATE infrared_Init( uint8_t sensor_pin )
+SENSOR_STATES infrared_Init( uint8_t sensor_pin )
 {
     pinMode(sensor_pin, INPUT);
     attachInterrupt(digitalPinToInterrupt(sensor_pin), drops_count, FALLING);
     watch = true;
 }
 
-SENSOR_STATE infrared_SetRate( void )
+SENSOR_STATES infrared_SetRate( void )
 {
     if(watch){
       unsigned long currentMillis = millis();

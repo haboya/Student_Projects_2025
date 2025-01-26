@@ -1,6 +1,8 @@
 
 #include "dripset_monitor_config.h"
 
+#define DEBUG_DEVICE_SATES 
+#define MOTOR_PIN                   D7
 #define BUZZER_PIN                  D7
 #define INFRARED_PIN                D6
 #define LOAD_CELL_SCK_PIN           D2
@@ -11,9 +13,9 @@
 #define MINIMUM_FLOW_RATE           10
 #define MAXIMUM_FLOW_RATE           30
 
-DRIPSET_STATE dripset_state;
+DRIPSET_STATES dripset_state;
 DRIPSET_PARAMS dripset_params;
-SENSOR_STATE sensor_state;
+SENSOR_STATES sensor_state;
 
 void beepBuzzer( uint8_t buzzer_rate_500ms)
 {
@@ -25,11 +27,30 @@ void beepBuzzer( uint8_t buzzer_rate_500ms)
     }
 }
 
+bool setDripState( DRIPSET_STATES state)
+{
+    if(dripset_state != state)
+    {
+        #ifdef DEBUG_DEVICE_SATES
+        Serial.print("Device state changed from ");
+        Serial.print(dripset_state);
+        Serial.print(" to ");
+        Serial.println(state);
+        #endif
+        dripset_state = state;
+        return true;
+    }
+    return false;
+}
+
 void setup()
 {
     Serial.begin(115200);
 
     //reset all variable parameters
+    dripset_params.cutoff_volume = CUTOFF_VOLUME;
+    dripset_params.minimum_flow_rate = MINIMUM_FLOW_RATE;
+    dripset_params.maximum_flow_rate = MAXIMUM_FLOW_RATE;
     dripset_params.drip_flow_rate = 0;
     dripset_params.drip_running = false;
     dripset_params.drip_volume_left = 0;
@@ -37,14 +58,14 @@ void setup()
     
     //init buzzer
     pinMode(BUZZER_PIN, OUTPUT);
-    SENSOR_STATE infrared_state = SENSOR_STATE_BUSY;
+    SENSOR_STATES infrared_state = SENSOR_STATE_BUSY;
 
     do{
         infrared_state = infrared_Init(INFRARED_PIN);
     }
     while(infrared_state == SENSOR_STATE_BUSY);
 
-    SENSOR_STATE loadcell_state = SENSOR_STATE_BUSY;
+    SENSOR_STATES loadcell_state = SENSOR_STATE_BUSY;
     do{
         loadcell_state = load_cell_Init(LOAD_CELL_SDA_PIN,LOAD_CELL_SCK_PIN);
     }
@@ -52,12 +73,14 @@ void setup()
 
     if(infrared_state == SENSOR_STATE_ERROR || loadcell_state == SENSOR_STATE_ERROR)
     {
-        dripset_state = DRIP_STATE_ERROR;
+        setDripState(DRIP_STATE_ERROR);
     }
     else
     {
-        dripset_state  = DRIP_STATE_OFF;
+        setDripState(DRIP_STATE_OFF);
     }
+
+    motor_Init(MOTOR_PIN);
 
 }
 
@@ -65,7 +88,10 @@ void loop()
 {
     if((load_cell_SetVolume() == SENSOR_STATE_ERROR) || (infrared_SetRate() == SENSOR_STATE_ERROR))
     {
-        dripset_state = DRIP_STATE_ERROR;
+        #ifdef DEBUG_DEVICE_SATES
+        Serial.println("Error in setting sensor values");
+        #endif
+        setDripState(DRIP_STATE_ERROR);
     }
 
     switch( dripset_state)
@@ -73,37 +99,39 @@ void loop()
         case DRIP_STATE_OFF:
         {
             motor_OpenFlow();
-            beepBuzzer(6);
+            dripset_params.drip_running = false;
+            beepBuzzer(20);
             if(dripset_params.drip_flow_rate > 0)
             {
-                dripset_state = DRIP_STATE_DRIPPING;
+                setDripState(DRIP_STATE_DRIPPING);
             }
             break;
         }
 
         case DRIP_STATE_DRIPPING:
         {
+            motor_OpenFlow();
+            dripset_params.drip_running = true;
             if(dripset_params.drip_flow_rate == 0)
             {
-                dripset_state = DRIP_STATE_OFF;
+                setDripState(DRIP_STATE_OFF);
             }
-
-            motor_OpenFlow();
-            if( (dripset_params.drip_flow_rate < MINIMUM_FLOW_RATE) || 
-                (dripset_params.drip_flow_rate > MAXIMUM_FLOW_RATE) ||
-                (dripset_params.drip_volume_left <= CUTOFF_VOLUME)
+            else if((dripset_params.drip_flow_rate < dripset_params.minimum_flow_rate) || 
+                    (dripset_params.drip_flow_rate > dripset_params.maximum_flow_rate) ||
+                    (dripset_params.drip_volume_left <= dripset_params.cutoff_volume)
             )
             {
-                dripset_state = DRIP_STATE_STOPPED;
+                setDripState(DRIP_STATE_STOPPED);
             }
 
-            beepBuzzer(20);
+            beepBuzzer(8);
             break;
         }
 
         case DRIP_STATE_STOPPED:
         {
             motor_CloseFlow();
+            dripset_params.drip_running = false;
             beepBuzzer(2);
             break;
         }
@@ -111,9 +139,10 @@ void loop()
         case DRIP_STATE_ERROR:
         {
             motor_CloseFlow();
+            dripset_params.drip_running = false;
             if((load_cell_SetVolume() != SENSOR_STATE_ERROR) && (infrared_SetRate() != SENSOR_STATE_ERROR))
             {
-                dripset_state = DRIP_STATE_OFF;
+                setDripState(DRIP_STATE_OFF);
             }
             beepBuzzer(1);
             break;

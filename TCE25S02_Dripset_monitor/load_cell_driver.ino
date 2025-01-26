@@ -2,11 +2,9 @@
 #include "dripset_monitor_config.h"
 #include <HX711.h>
 
-#define TOP_FULL_VAL      482
-#define GETTING_FULL_VAL  440
-#define HALF_FULL_VAL     400
-#define RUNNING_LOW_VAL   340
-#define EMPTY_CAN_VAL     315
+#define FULL_BOTTLE_VAL      482
+#define EMPTY_BOOTLE_VAL     315
+#define MAXIMUM_VOLUME       500
 
 HX711 scale;
 unsigned long lc_millis;
@@ -30,34 +28,24 @@ SENSOR_STATES load_cell_SetVolume( void )
         
         if (scale.is_ready()) 
         {
-          long reading = scale.read()/1000;
+            long reading = scale.read()/1000;
 
-          if(reading >= TOP_FULL_VAL)
-          {
-              device_params.current_weight = TOP_FULL;
-          }
-          else if(reading >= GETTING_FULL_VAL)
-          {
-              device_params.current_weight = GETTING_FULL;
-          }
-          else if(reading >= HALF_FULL_VAL)
-          {
-              device_params.current_weight = HALF_FULL;
-          }
-          else if(reading >= RUNNING_LOW_VAL)
-          {
-              device_params.current_weight = RUNNING_OUT;
-          }
-          else if(reading >= EMPTY_CAN_VAL)
-          {
-              device_params.current_weight = EMPTY_CAN;
-          }
-          else
-          {
-              device_params.current_weight = NO_CAN;
-          }
+            if(reading < EMPTY_BOOTLE_VAL)
+            {
+                Serial.println("Bottle is empty");
+                dripset_params.drip_volume_left = 0;
+            }
+            else if(reading > FULL_BOTTLE_VAL)
+            {
+                Serial.println("Bottle is too full");
+                dripset_params.drip_volume_left = MAXIMUM_VOLUME;
+            }
+            else
+            {
+                dripset_params.drip_volume_left = (reading - EMPTY_BOOTLE_VAL) * MAXIMUM_VOLUME / (FULL_BOTTLE_VAL - EMPTY_BOOTLE_VAL);
+            }
 
-          return SENSOR_STATE_READY;
+            return SENSOR_STATE_READY;
         } 
         else 
         {
