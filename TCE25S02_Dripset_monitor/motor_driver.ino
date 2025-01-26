@@ -5,49 +5,31 @@
 #define CLOSED_POSITION 90
 #define OPENED_POSITION 180
 
-Servo flow_motor;
+Servo drip_motor;
 
-void motor_Init( uint8_t motor_pin )
+void motor_Init(uint8_t motor_pin)
 {
-    flow_motor.attach(motor_pin);
+    drip_motor.attach(motor_pin);
+    motor_CloseFlow();
 }
 
-void motor_CloseFlow( void ){
-      int curr_position = gas_motor.read();
-      for(int i=0; i<=CLOSED_POSITION; i++){
-        gas_motor.write(curr_position - 1);
-      }
+void motor_CloseFlow( void )
+{
+    int curr_position = drip_motor.read();
+    for(curr_position; curr_position>=CLOSED_POSITION; curr_position--){
+      drip_motor.write(curr_position);
+      delay(15);
+    }
+    dripset_params.drip_running = false;
 }
 
-void motor_CloseFlow( void ){
-      int curr_position = gas_motor.read();
-      for(int i=0; i<=CLOSED_POSITION; i++){
-        gas_motor.write(curr_position + 1);
-      }
+void motor_OpenFlow( void )
+{
+    int curr_position = drip_motor.read();
+    for(curr_position; curr_position<=OPENED_POSITION; curr_position++){
+      drip_motor.write(curr_position);
+      delay(15);
+    }
+
+    dripset_params.drip_running = true;
 }
-
-// bool motor_OpenFlow( void )
-// {
-//     int curr_position = flow_motor.read();
-//     if(curr_position >= OPENED_POSITION) return true;
-
-//     if(curr_position < OPENED_POSITION)
-//     {
-//         flow_motor.write(curr_position + 1);
-//     }
-
-//     return false;
-// }
-
-// bool motor_CloseFlow( void )
-// {
-//     int curr_position = flow_motor.read();
-//     if(curr_position <= CLOSED_POSITION) return true;
-
-//     if(curr_position > CLOSED_POSITION)
-//     {
-//         flow_motor.write(curr_position - 1);
-//     }
-
-//     return false;
-// }

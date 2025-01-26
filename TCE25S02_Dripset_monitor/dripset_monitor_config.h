@@ -9,7 +9,7 @@
     #define DRIPSET_MONITOR_STRING_LEN  32
     #define DRIPSET_IOT_UPDATE_INTERVAL 1
 
-    typedef enum DRIPSET_STATE
+    typedef enum DRIPSET_STATES
     {
         /// @brief when still getting stuff ready
         DRIP_STATE_INIT,
@@ -26,15 +26,15 @@
         /// @brief when there is error state, could be sensor failure or out of range parameters
         DRIP_STATE_ERROR
     }
-    DRIPSET_STATE;
+    DRIPSET_STATES;
 
-    typedef enum SENSOR_STATE
+    typedef enum SENSOR_STATES
     {
         SENSOR_STATE_ERROR,
         SENSOR_STATE_BUSY,
         SENSOR_STATE_READY
     }
-    SENSOR_STATE;
+    SENSOR_STATES;
 
     typedef struct DRIPSET_PARAMS
     {
@@ -58,13 +58,13 @@
     /// @retval SENSOR_STATE_READY if the value is valid and set successfully
     /// @retval SENSOR_STATE_BUSY if there is pending conversion before the value can be set
     /// @retval SENSOR_STATE_ERROR if the required value can't be set for some reason
-    SENSOR_STATE infrared_SetRate( void );
+    SENSOR_STATES infrared_SetRate( void );
 
     /// @brief Initialize the infrared sensor used for determining flow rate 
     /// @param sensor_pin the pin number on which the sensor is connected
     /// @retval SENSOR_STATE_READY if the initilisation is complete
     /// @retval SENSOR_STATE_ERROR if the sensor can't be set up
-    SENSOR_STATE infrared_Init( uint8_t sensor_pin );
+    SENSOR_STATES infrared_Init( uint8_t sensor_pin );
 
     /// @brief Initialize the load cell sensor 
     /// @param sda_pin data pin of the load sensor
@@ -72,13 +72,13 @@
     /// @retval SENSOR_STATE_READY if the initilisation is complete
     /// @retval SENSOR_STATE_ERROR if the sensor can't be set up
     /// @note This load sensor uses the hx711 drivers
-    SENSOR_STATE load_cell_Init( uint8_t sda_pin, uint8_t sck_pin );
+    SENSOR_STATES load_cell_Init( uint8_t sda_pin, uint8_t sck_pin );
 
     /// @brief This function sets the remaining volume of the liquid in the dripset_params struct
     /// @retval SENSOR_STATE_READY if the value is valid and set successfully
     /// @retval SENSOR_STATE_BUSY if there is pending conversion before the value can be set
     /// @retval SENSOR_STATE_ERROR if the required value can't be set for some reason
-    SENSOR_STATE load_cell_SetVolume( void );
+    SENSOR_STATES load_cell_SetVolume( void );
 
 
     /// @brief Setup connection with the IOT platform 
@@ -90,7 +90,7 @@
     bool iot_UpdateStatus( void );
 
     void motor_Init( void );
-    bool motor_OpenFlow( void );
-    bool motor_CloseFlow( void );
+    void motor_OpenFlow( void );
+    void motor_CloseFlow( void );
 
 #endif
