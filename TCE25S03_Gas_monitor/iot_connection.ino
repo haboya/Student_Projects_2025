@@ -3,9 +3,9 @@
 #include <ESP8266WiFi.h>
 #include <ThingSpeak.h>
 
-#define IOT_UPDATE_INTERVAL 3
-const char* ssid = "PowerUP_Lab";
-const char* password = "#powerup2"; 
+#define IOT_UPDATE_INTERVAL 6
+const char* ssid = "boffins_mobile";
+const char* password = "Boffins@13"; 
 
 WiFiClient  client;
 
@@ -39,29 +39,31 @@ bool iot_UpdateStatus( void )
     // reconnect to wifi if disconnected
     if(WiFi.status() != WL_CONNECTED)
     {
+        Serial.println("WiFi disconnected. Reconnecting...");
         WiFi.begin(ssid, password);
         prev_send_millis = millis();
         return false;
     }
     
-    if(iot_params.current_weight != device_params.current_weight)
-    {
-        iot_params.current_weight = device_params.current_weight;
-        new_data = true;
-    }
-    else if(iot_params.gas_status != device_params.gas_status)
-    {
-        iot_params.gas_status = device_params.gas_status;
-        new_data = true;
-    }
-    else if(iot_params.motor_status != device_params.motor_status)
-    {
-        iot_params.motor_status = device_params.motor_status;
-        new_data = true;
-    }
+    // if(iot_params.current_weight != device_params.current_weight)
+    // {
+    //     iot_params.current_weight = device_params.current_weight;
+    //     new_data = true;
+    // }
+    // else if(iot_params.gas_status != device_params.gas_status)
+    // {
+    //     iot_params.gas_status = device_params.gas_status;
+    //     new_data = true;
+    // }
+    // else if(iot_params.motor_status != device_params.motor_status)
+    // {
+    //     iot_params.motor_status = device_params.motor_status;
+    //     new_data = true;
+    // }
     
-    if(new_data)
-    {
+    // if(new_data)
+    // {
+        Serial.println("Updating ThingSpeak channel...");
         // set the fields with the values
         ThingSpeak.setField(1, device_params.current_weight); //volume
         ThingSpeak.setField(2, device_params.gas_status); //leakage
@@ -75,7 +77,7 @@ bool iot_UpdateStatus( void )
         else{
         Serial.println("Problem updating channel. HTTP error code " + String(x));
         }
-    }
+    // }
 
     prev_send_millis = millis();
     return true;
