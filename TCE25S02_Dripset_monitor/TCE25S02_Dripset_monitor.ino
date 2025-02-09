@@ -1,4 +1,10 @@
 
+#define BLYNK_TEMPLATE_ID "TMPL2C2GdsF4U"
+#define BLYNK_TEMPLATE_NAME "DRIP MONITOR"
+#define BLYNK_AUTH_TOKEN "yokyjZh4Ol7eLta3Uonxbu2VpMRV91Wf"
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+
 #include "dripset_monitor_config.h"
 
 #define DEBUG_DEVICE_SATES 
@@ -16,6 +22,61 @@
 DRIPSET_STATES dripset_state;
 DRIPSET_PARAMS dripset_params;
 SENSOR_STATES sensor_state;
+
+/// @brief Iot Connection stuff moved here due to compiler conflicts failing to compile
+const char* ssid = "PowerUPLab";
+const char* password = "#powerup2"; 
+
+BlynkTimer timer;
+
+bool iot_data_sent = false;
+
+BLYNK_WRITE(V3)
+{
+    dripset_params.cutoff_volume = param.asInt();
+}
+
+BLYNK_WRITE(V4)
+{
+    dripset_params.minimum_flow_rate = param.asInt();
+}
+
+BLYNK_WRITE(V5)
+{
+    dripset_params.maximum_flow_rate = param.asInt();
+}
+
+void iot_sendData( void )
+{
+    Blynk.virtualWrite(V0, dripset_params.drip_running);
+    Blynk.virtualWrite(V1, dripset_params.drip_flow_rate);
+    Blynk.virtualWrite(V2, dripset_params.drip_volume_left);
+
+    iot_data_sent = true;
+}
+
+bool iot_Init( void )
+{
+    Blynk.begin(BLYNK_AUTH_TOKEN, ssid, password);
+    timer.setInterval(1000L, iot_sendData);
+
+    return true;
+}
+
+bool iot_UpdateStatus( void )
+{
+    Blynk.run();
+    timer.run();
+
+    if(iot_data_sent != false)
+    {
+        iot_data_sent = false;
+        return true;
+    }
+
+    return false;
+}
+/* -------------------------- iot connection stuff -------------------------- */
 
 void beepBuzzer( uint8_t buzzer_rate_500ms)
 {
