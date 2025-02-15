@@ -2,10 +2,21 @@
 #ifndef VEHICLE_DETECTION_CONFIG_H
     #define VEHICLE_DETECTION_CONFIG_H
 
+    #define DISPLAY_UPDATE_INTERVAL     800
+    #define VEHICLE_SENSOR_SAMPLES      5
+    #define VEHICLE_TOTAL_IR_SENSORS    2
+    #define VEHICLE_SENSOR_IR1          2
+    #define VEHICLE_SENSOR_IR2          3
+    #define VEHICLE_SENSOR_TRIG         4
+    #define VEHICLE_SENSOR_ECHO         5
+    #define VEHICLE_MAXIMUM_DISTANCE    50
+    #define VEHICLE_DISTANCE_TO_SENSORS 20
+    #define VEHICLE_DISTANCE_IN_SENSORS 5
+
     bool Incoming_Init( void );
     uint8_t Incoming_GetVehicleDistance( void );
 
-    bool Stationary_Init( void );
+    bool Stationary_Init( uint8_t sensor_pins[] );
     uint8_t Stationary_GetVehicleDistance( void );
 
     bool Disp_Init( void );
