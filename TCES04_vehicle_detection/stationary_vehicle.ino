@@ -15,9 +15,9 @@ bool Stationary_Init( uint8_t sensor_pins[] )
     return true;
 }
 
-uint8_t Stationary_GetVehicleDistance( void )
+uint16_t Stationary_GetVehicleDistance( void )
 {
-    uint8_t ir_distance = 0;
+    uint16_t ir_distance = 0;
     for(int pin=0; pin<VEHICLE_TOTAL_IR_SENSORS; pin++)
     {
         if( digitalRead(IR_sensor_pins[pin]) == false )

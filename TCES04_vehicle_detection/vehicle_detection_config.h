@@ -12,12 +12,13 @@
     #define VEHICLE_MAXIMUM_DISTANCE    50
     #define VEHICLE_DISTANCE_TO_SENSORS 20
     #define VEHICLE_DISTANCE_IN_SENSORS 5
+    #define VEHICLE_DETECTED_BUZZER     9
 
     bool Incoming_Init( void );
     uint8_t Incoming_GetVehicleDistance( void );
 
     bool Stationary_Init( uint8_t sensor_pins[] );
-    uint8_t Stationary_GetVehicleDistance( void );
+    uint16_t Stationary_GetVehicleDistance( void );
 
     bool Disp_Init( void );
     bool Disp_Update( void );
