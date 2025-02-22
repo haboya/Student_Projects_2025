@@ -65,6 +65,18 @@ function appendSensorData( data_array)
     }
 }
 
+function openChartView()
+{
+    document.getElementById('chart-container').style.display = "block";
+    document.getElementById('raw-values').style.display = "none";
+}
+
+function closeChartView()
+{
+    document.getElementById('chart-container').style.display = "none";
+    document.getElementById('raw-values').style.display = "block";
+}
+
 const ctx = document.getElementById('sensorGraph').getContext('2d');
 const sensorChart = new Chart(ctx, {
     type: 'line',
@@ -176,6 +188,21 @@ const updateChartData = setInterval(()=>{
 
     if(new_data_update == true && !pause_chart_update){
         sensorChart.update();
+        const index = sensorData.labels.length - 1;
+        document.getElementById('relay1-value').innerText = sensorData.datasets[0].data[index];
+        document.getElementById('relay2-value').innerText = sensorData.datasets[1].data[index];
+        document.getElementById('relay3-value').innerText = sensorData.datasets[2].data[index];
+        document.getElementById('relay4-value').innerText = sensorData.datasets[3].data[index];
+        document.getElementById('relay5-value').innerText = sensorData.datasets[4].data[index];
+        document.getElementById('relay6-value').innerText = sensorData.datasets[5].data[index];
+        
+        // if(sensorData.datasets[0].data[index] < 3.0){
+        //     if(sensorData.datasets[0].data[index] > 3.0) {
+        //         document.getElementById('relay1-state').checked = true;
+        //     } else {
+        //         document.getElementById('relay1-state').checked = false;
+        //     }
+        // }
         new_data_update = false;
     }
 }, 5000);
