@@ -1,0 +1,57 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+
+header {
+    background: #35424a;
+    color: #ffffff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+h1 {
+    margin: 0;
+    margin-bottom: 20px;
+}
+
+#pause-btn {
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 15px;
+    border-radius: 11%;
+}
+
+#pause-btn:hover {
+    color: aqua;
+    background-color: #5d1e02;
+}
+
+.graph-container {
+    position: relative;
+    height: 400px;
+    margin-top: 20px;
+}
+
+canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+
+.footer {
+    text-align: center;
+    padding: 10px 0;
+    background: #35424a;
+    color: #ffffff;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}

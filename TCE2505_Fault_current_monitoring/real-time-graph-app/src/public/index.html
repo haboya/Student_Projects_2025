@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Sensor Data</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>
+            Real-Time Sensor Data
+            <button id="pause-btn" onclick="toggleChartUpdate()">Pause</button>
+        </h1>
+        <canvas id="sensorGraph" width="800" height="400"></canvas>
+    </div>
+    <script src="chart.js"></script>
+    <script src="chartjs-adapter-date-fns.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="scripts.js"></script>
+</body>
+</html>
