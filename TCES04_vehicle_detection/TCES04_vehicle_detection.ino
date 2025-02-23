@@ -11,11 +11,28 @@ void beepBuzzer(uint8_t buzzer_rate_500ms)
     static unsigned long buzzer_millis = 0;
     if(millis() - buzzer_millis > buzzer_rate_500ms*500)
     {
-        // tone(BUZZER, 4000, 150);
-        analogWrite(VEHICLE_DETECTED_BUZZER, 180);
-        delay(60);
+        // tone(VEHICLE_DETECTED_BUZZER, 4000, 150); //Not used coz it's timer is already in use
+        analogWrite(VEHICLE_DETECTED_BUZZER, 55);
+        delay(40);
         analogWrite(VEHICLE_DETECTED_BUZZER, 0);
         buzzer_millis = millis();
+    }
+}
+
+void findBuzzerSound( void )
+{
+    for(int value=0; value <= 255; value+=5)
+    {
+        Serial.print("Now: ");
+        Serial.println(value);
+        for(int i=0; i<3; i++)
+        {
+            analogWrite(VEHICLE_DETECTED_BUZZER, value);
+            delay(40);
+            analogWrite(VEHICLE_DETECTED_BUZZER, 0);
+            delay(1000);
+        }
+        delay(1000);
     }
 }
 
@@ -34,6 +51,7 @@ void setup()
         Serial.begin(9600);
     #endif
     pinMode( VEHICLE_DETECTED_BUZZER, OUTPUT);
+    // findBuzzerSound(); //used to determine the right frequency of the buzzer
     if( !Disp_Init())
     {
         handleError();
@@ -75,13 +93,20 @@ void loop()
         if(distance_apart == broken_vehicle)
         {
             sprintf(alert_msg, "At: %uM point", distance_apart);
-            beepBuzzer(4);
+            beepBuzzer(8);
         }
         else
         {
             //incoming vehicle
             sprintf(alert_msg, "%uM ahead", distance_apart);
-            beepBuzzer(2);
+            if(distance_apart < 25)      beepBuzzer(1);
+            else if(distance_apart < 30) beepBuzzer(2);
+            else if(distance_apart < 35) beepBuzzer(3);
+            else if(distance_apart < 40) beepBuzzer(4);
+            else if(distance_apart < 45) beepBuzzer(5);
+            else if(distance_apart < 50) beepBuzzer(6);
+            else if(distance_apart < 55) beepBuzzer(7);
+            else                         beepBuzzer(8);
         }
 
         Disp_SetMessage(alert_msg, 2);

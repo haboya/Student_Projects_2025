@@ -13,6 +13,11 @@ bool disp_line2;
 
 unsigned long disp_millis;
 
+void disp_clearLine( void )
+{
+    lcd.print("                ");
+}
+
 bool Disp_Init( void )
 {
     Wire.begin();
@@ -50,12 +55,16 @@ bool Disp_Update( void )
         if(disp_line1)
         {
             lcd.setCursor(0,0);
+            disp_clearLine();
+            lcd.setCursor(0,0);
             lcd.print( disp_line1_msg );
             disp_line1 = false;
         }
 
         if( disp_line2 )
         {
+            lcd.setCursor(0,1);
+            disp_clearLine();
             lcd.setCursor(0,1);
             lcd.print( disp_line2_msg );
             disp_line2 = false;
@@ -79,13 +88,13 @@ bool Disp_SetMessage( const char *msg, uint8_t line )
 
     if( line == 1 )
     {
-        memset( disp_line1_msg, 0, strlen( disp_line1_msg ) );
+        memset( disp_line1_msg, 0, DISP_MSG_LEN+1 );
         sprintf( disp_line1_msg, "%s", msg );
         disp_line1 = true;
     }
     else if( line == 2 )
     {
-        memset( disp_line2_msg, 0, strlen( disp_line2_msg ) );
+        memset( disp_line2_msg, 0, DISP_MSG_LEN+1 );
         sprintf( disp_line2_msg, "%s", msg );
         disp_line2 = true;
     }
