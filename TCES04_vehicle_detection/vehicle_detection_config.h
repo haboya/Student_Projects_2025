@@ -10,9 +10,9 @@
     #define VEHICLE_SENSOR_IR2          3
     #define VEHICLE_SENSOR_TRIG         4
     #define VEHICLE_SENSOR_ECHO         5
-    #define VEHICLE_MAXIMUM_DISTANCE    50
-    #define VEHICLE_DISTANCE_TO_SENSORS 10
-    #define VEHICLE_DISTANCE_IN_SENSORS 5
+    #define VEHICLE_MAXIMUM_DISTANCE    22
+    #define VEHICLE_DISTANCE_TO_SENSORS 1
+    #define VEHICLE_DISTANCE_IN_SENSORS 15
     #define VEHICLE_DETECTED_BUZZER     6
 
     bool Incoming_Init( void );

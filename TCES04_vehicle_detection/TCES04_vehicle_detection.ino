@@ -99,14 +99,7 @@ void loop()
         {
             //incoming vehicle
             sprintf(alert_msg, "%uM ahead", distance_apart);
-            if(distance_apart < 25)      beepBuzzer(1);
-            else if(distance_apart < 30) beepBuzzer(2);
-            else if(distance_apart < 35) beepBuzzer(3);
-            else if(distance_apart < 40) beepBuzzer(4);
-            else if(distance_apart < 45) beepBuzzer(5);
-            else if(distance_apart < 50) beepBuzzer(6);
-            else if(distance_apart < 55) beepBuzzer(7);
-            else                         beepBuzzer(8);
+            beepBuzzer(2);
         }
 
         Disp_SetMessage(alert_msg, 2);
