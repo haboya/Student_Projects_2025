@@ -4,7 +4,7 @@ const port = new SerialPort({ path: 'COM1', baudRate: 9600 });
 const parser = port.pipe(new ReadlineParser({ delimiter: '\n' }));
 
 function generateSensorData() {
-    return Array.from({ length: 6 }, () => (Math.random() * 20).toFixed(2));
+    return Array.from({ length: 5 }, () => (Math.random() * 20).toFixed(2));
 }
 
 port.on('open', () => {

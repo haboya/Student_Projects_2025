@@ -8,7 +8,6 @@ interface SensorData {
     sensor3: number;
     sensor4: number;
     sensor5: number;
-    sensor6: number;
     data_time: string;
 }
 
@@ -48,7 +47,7 @@ export class SerialService extends EventEmitter {
 
     private parseSensorData(data: string): SensorData | null {
         const values = data.split(',').map(Number);
-        if (values.length === 6) {
+        if (values.length === 5) {
             const dt = new Date();
             return {
                 sensor1: values[0],
@@ -56,7 +55,6 @@ export class SerialService extends EventEmitter {
                 sensor3: values[2],
                 sensor4: values[3],
                 sensor5: values[4],
-                sensor6: values[5],
                 data_time: dt.toISOString(),
             };
         }
