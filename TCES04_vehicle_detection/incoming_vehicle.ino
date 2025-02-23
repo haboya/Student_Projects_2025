@@ -32,7 +32,16 @@ uint8_t Incoming_GetVehicleDistance( void )
         inc_average_cm += Inc_distance[i];
     }
 
-    return (uint8_t)(inc_average_cm/VEHICLE_SENSOR_SAMPLES);
+    inc_average_cm = inc_average_cm/VEHICLE_SENSOR_SAMPLES;
+    if(inc_average_cm > 5)
+    {
+        return (inc_average_cm - 5);
+    }
+    else if(inc_average_cm > 0)
+    {
+        return 1;
+    }
+    return 0;
 }
 
 /* ------------------------------- END_OF_FILE ------------------------------ */
