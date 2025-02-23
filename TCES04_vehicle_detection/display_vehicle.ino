@@ -18,12 +18,18 @@ bool Disp_Init( void )
     Wire.begin();
     Wire.beginTransmission(0x27);
     uint8_t error = Wire.endTransmission();
-
+    
     if( error != 0)
     {
+        #ifdef DEBUG_SYSTEM
+            Serial.println("LCD not found");
+        #endif
         return false;
     }
-
+    
+    #ifdef DEBUG_SYSTEM
+        Serial.println("LCD found");
+    #endif
     lcd.begin(16, 2);
     lcd.setBacklight(255);
     lcd.print("Initialising...");

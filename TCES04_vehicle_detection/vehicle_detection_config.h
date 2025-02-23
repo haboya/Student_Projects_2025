@@ -2,6 +2,7 @@
 #ifndef VEHICLE_DETECTION_CONFIG_H
     #define VEHICLE_DETECTION_CONFIG_H
 
+    #define DEBUG_SYSTEM
     #define DISPLAY_UPDATE_INTERVAL     800
     #define VEHICLE_SENSOR_SAMPLES      5
     #define VEHICLE_TOTAL_IR_SENSORS    2
@@ -12,7 +13,7 @@
     #define VEHICLE_MAXIMUM_DISTANCE    50
     #define VEHICLE_DISTANCE_TO_SENSORS 20
     #define VEHICLE_DISTANCE_IN_SENSORS 5
-    #define VEHICLE_DETECTED_BUZZER     9
+    #define VEHICLE_DETECTED_BUZZER     6
 
     bool Incoming_Init( void );
     uint8_t Incoming_GetVehicleDistance( void );

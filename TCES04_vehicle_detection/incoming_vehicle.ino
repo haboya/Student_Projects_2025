@@ -13,6 +13,10 @@ bool Incoming_Init( void )
     }
 
     Inc_ping_index = 0;
+    #ifdef DEBUG_SYSTEM
+        Serial.print("Ultrasonic Ready: ");
+        Serial.println(Inc_distance[VEHICLE_SENSOR_SAMPLES-1]);
+    #endif
 
     return true;
 }

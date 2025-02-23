@@ -30,6 +30,9 @@ void handleError( void )
 
 void setup()
 {
+    #ifdef DEBUG_SYSTEM
+        Serial.begin(9600);
+    #endif
     pinMode( VEHICLE_DETECTED_BUZZER, OUTPUT);
     if( !Disp_Init())
     {
@@ -54,6 +57,13 @@ void loop()
     uint8_t moving_vehicle = Incoming_GetVehicleDistance();
     uint16_t broken_vehicle = Stationary_GetVehicleDistance();
 
+    #ifdef DEBUG_SYSTEM
+        Serial.print("Inc: ");
+        Serial.println(moving_vehicle);
+        Serial.print("Sta: ");
+        Serial.println(broken_vehicle);
+    #endif
+
     if(broken_vehicle > 0)
     {
         //sensed broken vehicle
@@ -74,7 +84,7 @@ void loop()
             beepBuzzer(2);
         }
 
-        Disp_SetMessage(alert_msg, 1);
+        Disp_SetMessage(alert_msg, 2);
     }
     else
     {
