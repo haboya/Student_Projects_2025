@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Sensor Data</title>
+    <title>Fault Current Monitoring</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
         <div class="chart-container animate" id="chart-container">
             <a href="javascript:void(0)" class="closebtn" onclick="closeChartView()">&times;</a>
             <h1>
-                Real-Time Sensor Data
+                FAULT CURRENT MONITORING
                 <button id="pause-btn" onclick="toggleChartUpdate()">Pause</button>
             </h1>
             <canvas id="sensorGraph" width="800" height="400"></canvas>
@@ -20,7 +20,7 @@
         <div class="sensor-values" id="raw-values">
             <span class="closebtn" style="font-size:20px;cursor:pointer" onclick="openChartView()">&#9776; Open Graph</span>
             <h1 style="text-align: center;">
-                Real-Time Sensor Data
+                FAULT CURRENT MONITORING
             </h1>
             <div class="row">
                 <div class="column">
@@ -69,7 +69,7 @@
                             <span class="slider round"></span>
                         </label>
                         <h4 id="relay4-value">
-                            12.19 A
+                            0.0 A
                         </h4>
                     </div>
                 </div>
@@ -81,7 +81,7 @@
                             <span class="slider round"></span>
                         </label>
                         <h4 id="relay5-value">
-                            10.85 A
+                            0.0 A
                         </h4>
                     </div>
                 </div>
