@@ -21,7 +21,7 @@ const sensorData = {
     ]
 };
 
-const RELAY_OFF_THESHOLD = 10.1;
+const RELAY_OFF_THESHOLD = 0.1;
 let new_data_update = false;
 let pause_chart_update = false;
 
@@ -58,6 +58,42 @@ function appendSensorData( data_array)
         sensorData.datasets[2].data.shift();
         sensorData.datasets[3].data.shift();
         sensorData.datasets[4].data.shift();
+    }
+}
+
+function updateRelayStatus()
+{
+    const index = sensorData.labels.length - 1;
+    document.getElementById('relay1-value').innerText = sensorData.datasets[0].data[index] + ' A';
+    document.getElementById('relay2-value').innerText = sensorData.datasets[1].data[index] + ' A';
+    document.getElementById('relay3-value').innerText = sensorData.datasets[2].data[index] + ' A';
+    document.getElementById('relay4-value').innerText = sensorData.datasets[3].data[index] + ' A';
+    document.getElementById('relay5-value').innerText = sensorData.datasets[4].data[index] + ' A';
+    
+    if(sensorData.datasets[0].data[index] < RELAY_OFF_THESHOLD) {
+        document.getElementById('relay1-state').checked = false;
+    } else {
+        document.getElementById('relay1-state').checked = true;
+    }
+    if(sensorData.datasets[1].data[index] < RELAY_OFF_THESHOLD) {
+        document.getElementById('relay2-state').checked = false;
+    } else {
+        document.getElementById('relay2-state').checked = true;
+    }
+    if(sensorData.datasets[2].data[index] < RELAY_OFF_THESHOLD) {
+        document.getElementById('relay3-state').checked = false;
+    } else {
+        document.getElementById('relay3-state').checked = true;
+    }
+    if(sensorData.datasets[3].data[index] < RELAY_OFF_THESHOLD) {
+        document.getElementById('relay4-state').checked = false;
+    } else {
+        document.getElementById('relay4-state').checked = true;
+    }
+    if(sensorData.datasets[4].data[index] < RELAY_OFF_THESHOLD) {
+        document.getElementById('relay5-state').checked = false;
+    } else {
+        document.getElementById('relay5-state').checked = true;
     }
 }
 
@@ -168,6 +204,7 @@ fetch('/api/sensors/past')
 // Listen for updates from the server
 socket.on('data', (newData) => {
     appendSensorData(newData);
+    updateRelayStatus();
     // sensorChart.update();
     new_data_update = true;
 });
@@ -177,38 +214,6 @@ const updateChartData = setInterval(()=>{
 
     if(new_data_update == true && !pause_chart_update){
         sensorChart.update();
-        const index = sensorData.labels.length - 1;
-        document.getElementById('relay1-value').innerText = sensorData.datasets[0].data[index] + ' A';
-        document.getElementById('relay2-value').innerText = sensorData.datasets[1].data[index] + ' A';
-        document.getElementById('relay3-value').innerText = sensorData.datasets[2].data[index] + ' A';
-        document.getElementById('relay4-value').innerText = sensorData.datasets[3].data[index] + ' A';
-        document.getElementById('relay5-value').innerText = sensorData.datasets[4].data[index] + ' A';
-        
-        if(sensorData.datasets[0].data[index] < RELAY_OFF_THESHOLD) {
-            document.getElementById('relay1-state').checked = false;
-        } else {
-            document.getElementById('relay1-state').checked = true;
-        }
-        if(sensorData.datasets[1].data[index] < RELAY_OFF_THESHOLD) {
-            document.getElementById('relay2-state').checked = false;
-        } else {
-            document.getElementById('relay2-state').checked = true;
-        }
-        if(sensorData.datasets[2].data[index] < RELAY_OFF_THESHOLD) {
-            document.getElementById('relay3-state').checked = false;
-        } else {
-            document.getElementById('relay3-state').checked = true;
-        }
-        if(sensorData.datasets[3].data[index] < RELAY_OFF_THESHOLD) {
-            document.getElementById('relay4-state').checked = false;
-        } else {
-            document.getElementById('relay4-state').checked = true;
-        }
-        if(sensorData.datasets[4].data[index] < RELAY_OFF_THESHOLD) {
-            document.getElementById('relay5-state').checked = false;
-        } else {
-            document.getElementById('relay5-state').checked = true;
-        }
         new_data_update = false;
     }
 }, 5000);

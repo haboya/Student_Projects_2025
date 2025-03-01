@@ -1,27 +1,22 @@
 
 #include "arduino_sensor_config.h"
 
-#define CALIBRATION_THRESHOLD   1.947
-
-typedef struct CURRENT_SESNOR {
-    uint8_t ana_pin;
-    int max_val;
-    int new_val;
-    int old_val;
-    float rms;
-    float IRMS;
-} CURRENT_SESNOR;
 
 CURRENT_SESNOR sensor_bus87, sensor_bus14, sensor_bus16, sensor_bus22, sensor_bus24;
 
+int current_sensor_getMaxValue( CURRENT_SESNOR *sensor )
+{
+    int max_value = sensor->max_val[0];
+    for(int i = 1; i < SENSOR_SAMPLES; i++) {
+        if(sensor->max_val[i] > max_value) {
+            max_value = sensor->max_val[i];
+        }
+    }
+    return max_value;
+}
+
 bool current_sensor_init( CURRENT_SESNOR *sensor, uint8_t sensor_pin )
 {
-    sensor->max_val = 0;
-    sensor->new_val = 0;
-    sensor->old_val = 0;
-    sensor->rms = 0;
-    sensor->IRMS = 0;
-
     //confirm that sensor pin is valid anoalog pin
     if(sensor_pin < A0 || sensor_pin > A5) {
         return false;
@@ -29,28 +24,39 @@ bool current_sensor_init( CURRENT_SESNOR *sensor, uint8_t sensor_pin )
     sensor->ana_pin = sensor_pin;
     pinMode( sensor->ana_pin, INPUT );
 
+    for(int i=0; i<SENSOR_SAMPLES; i++)
+    {
+        sensor->max_val[i] = 0;
+    }
+    sensor->old_val = 0;
+    sensor->val_index = 0;
+    sensor->IRMS = 0;
+
     return true;
 }
 
 bool current_sensor_read( CURRENT_SESNOR *sensor )
 {
-    sensor->new_val = analogRead(sensor->ana_pin);
-    if(sensor->new_val > sensor->old_val)
+    int new_val = analogRead(sensor->ana_pin);
+    if(new_val > sensor->old_val)
     {
-        sensor->old_val = sensor->new_val;
+        sensor->old_val = new_val;
     }
     else
     {
         delayMicroseconds(50);
-        sensor->new_val = analogRead(sensor->ana_pin);
-        if(sensor->new_val < sensor->old_val) 
+        new_val = analogRead(sensor->ana_pin);
+        if(new_val < sensor->old_val) 
         {
-            sensor->max_val = sensor->old_val;
+            sensor->max_val[sensor->val_index] = sensor->old_val;
+            sensor->val_index = (sensor->val_index + 1) % SENSOR_SAMPLES;
             sensor->old_val = 0;
         }
         
-        sensor->rms = sensor->max_val * 5.00 * 0.707 / 1024.0;
-        sensor->IRMS = sensor->rms - CALIBRATION_THRESHOLD;
+        float rms = current_sensor_getMaxValue(sensor) * 5.00 * 0.707 / 1024.0;
+        sensor->IRMS = rms - CALIBRATION_THRESHOLD;
+        if(sensor->IRMS < 0.08) sensor->IRMS = 0.0;
+        sensor->IRMS = sensor->IRMS * 10.0;
 
         return true;
     }
@@ -141,8 +147,8 @@ void Sensors_Read( void )
             {
                 sensor_currents.bus87 = sensor_bus87.IRMS;
             }
-            break;
         }
+        break;
 
         case 1:
         {
@@ -150,8 +156,8 @@ void Sensors_Read( void )
             {
                 sensor_currents.bus14 = sensor_bus14.IRMS;
             }
-            break;
         }
+        break;
 
         case 2:
         {
@@ -159,8 +165,8 @@ void Sensors_Read( void )
             {
                 sensor_currents.bus16 = sensor_bus16.IRMS;
             }
-            break;
         }
+        break;
 
         case 3:
         {
@@ -168,8 +174,8 @@ void Sensors_Read( void )
             {
                 sensor_currents.bus22 = sensor_bus22.IRMS;
             }
-            break;
         }
+        break;
 
         case 4:
         {
@@ -177,8 +183,8 @@ void Sensors_Read( void )
             {
                 sensor_currents.bus24 = sensor_bus24.IRMS;
             }
-            break;
         }
+        break;
 
         default:
             break;
