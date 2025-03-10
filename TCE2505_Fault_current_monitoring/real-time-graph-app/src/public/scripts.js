@@ -24,6 +24,7 @@ const sensorData = {
 const RELAY_OFF_THESHOLD = 0.1;
 let new_data_update = false;
 let pause_chart_update = false;
+let droped_count = 0
 
 function toggleChartUpdate()
 {
@@ -42,6 +43,17 @@ function toggleChartUpdate()
 
 function appendSensorData( data_array)
 {
+    if(droped_count > 21 && data_array.sensor1 < 0.2){
+        return;
+    }
+
+    if(data_array.sensor1 < 0.1)
+    {
+        droped_count++;
+    }
+    else{
+        droped_count = 0;
+    }
     sensorData.labels.push(data_array.data_time);
     sensorData.datasets[0].data.push(data_array.sensor1);
     sensorData.datasets[1].data.push(data_array.sensor2);
@@ -109,6 +121,38 @@ function closeChartView()
     document.getElementById('raw-values').style.display = "block";
 }
 
+function downloadData() {
+    // Convert sensor data to CSV format
+    let csv = 'Time,Sensor1,Sensor2,Sensor3,Sensor4,Sensor5\n';
+    
+    for (let i = 0; i < sensorData.labels.length; i++) {
+        csv += `${sensorData.labels[i]},`;
+        csv += `${sensorData.datasets[0].data[i]},`;
+        csv += `${sensorData.datasets[1].data[i]},`;
+        csv += `${sensorData.datasets[2].data[i]},`;
+        csv += `${sensorData.datasets[3].data[i]},`;
+        csv += `${sensorData.datasets[4].data[i]}\n`;
+    }
+
+    // Create a Blob containing the CSV data
+    const blob = new Blob([csv], { type: 'text/csv' });
+    
+    // Create a temporary download link
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'sensor_data.csv');
+    document.body.appendChild(a);
+    
+    // Trigger the download
+    a.click();
+    
+    // Clean up
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+}
+
 const ctx = document.getElementById('sensorGraph').getContext('2d');
 const sensorChart = new Chart(ctx, {
     type: 'line',
@@ -123,7 +167,7 @@ const sensorChart = new Chart(ctx, {
                 fill: true,
             },
             {
-                label: 'Bus14',
+                label: 'Bus15',
                 data: sensorData.datasets[1].data,
                 borderColor: 'rgba(192, 75, 75, 1)',
                 // backgroundColor: 'rgba(192, 75, 75, 0.2)',
@@ -157,7 +201,7 @@ const sensorChart = new Chart(ctx, {
             x: {
                 type: 'time',
                 time: {
-                    unit: 'second'
+                    unit: 'millisecond'
                 },
                 title: {
                     display: true,
@@ -217,5 +261,6 @@ const updateChartData = setInterval(()=>{
         new_data_update = false;
     }
 }, 5000);
+
 
 /* ----------------------------------- EOF ---------------------------------- */

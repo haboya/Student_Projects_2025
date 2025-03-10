@@ -22,7 +22,6 @@ FAULT_PROCESS;
 SENSOR_CURRENTS sensor_currents;
 SENSOR_CURRENTS output_currents;
 SENSOR_CURRENTS temp_currents;
-FAULT_PROCESS fault_process = FAULT_PROCESS_INIT;
 READER_PROCESS fault_sensor = READER_PROCESS_READ;
 READER_PROCESS reader_process = READER_PROCESS_READ;
 
@@ -32,34 +31,67 @@ uint32_t wait_time = 0;
 
 void Process_SendCurrents( void )
 {
-    Serial.print(output_currents.bus87); Serial.print(",");
-    Serial.print(output_currents.bus14); Serial.print(",");
-    Serial.print(output_currents.bus16); Serial.print(",");
-    Serial.print(output_currents.bus22); Serial.print(",");
-    Serial.print(output_currents.bus24); Serial.print("\n");
+    #ifndef DEBUG_SENSOR_SYSTEM
+        Serial.print(output_currents.bus87); Serial.print(",");
+        Serial.print(output_currents.bus14); Serial.print(",");
+        Serial.print(output_currents.bus16); Serial.print(",");
+        Serial.print(output_currents.bus22); Serial.print(",");
+        Serial.print(output_currents.bus24); Serial.print("\n");
+    #endif
 }
 
-bool Process_HandleCase1( void )
+bool Process_HandleCase(READER_PROCESS curr_fault )
 {
-    output_currents.bus87 = sensor_currents.bus87;
-    return true;
-}
+    FAULT_PROCESS fault_process = FAULT_PROCESS_INIT;
 
-bool Process_HandleCase2( void )
-{
-    output_currents.bus14 = sensor_currents.bus14;
-    return true;
-}
+    while(1)
+    {
+        output_currents.bus87 = sensor_currents.bus87;
+        switch(fault_process)
+        {
+            case FAULT_PROCESS_INIT:
+            {
+                Process_SendCurrents();
+                delay(8);
+                output_currents.bus87 = 250 + getRandomVal();
+                fault_process = FAULT_PROCESS_SPIKE;
+                Process_SendCurrents();
+                delay(6);
+            }
+            break;
+    
+            case FAULT_PROCESS_SPIKE:
+            {
+                output_currents.bus87 = 552 + getRandomVal();
+                fault_process = FAULT_PROCESS_DROP;
+                Process_SendCurrents();
+                delay(4);
+            }
+            break;
+    
+            case FAULT_PROCESS_DROP:
+            {
+                output_currents.bus87 = 0;
+                output_currents.bus14 = 0;
+                output_currents.bus16 = 0;
+                output_currents.bus22 = 0;
+                output_currents.bus24 = 0;
+                // fault_process = FAULT_PROCESS_INIT;
+                // reader_process = READER_PROCESS_READ;
+                delay(200);
+                Process_SendCurrents();
+            }
+            break;
+        }
+        
 
-bool Process_HandleCase3( void )
-{
-    output_currents.bus16 = sensor_currents.bus16;
+    }
     return true;
 }
 
 float getRandomVal( void )
 {
-    return (float)(random(0, 10)*1.0) / 10.0;
+    return (float)(random(0, 10)*1.0) / 3.0;
 }
 
 void setup()
@@ -80,6 +112,7 @@ void loop()
 {
     Sensors_Read();
     current_time = millis();
+    
     switch(reader_process)
     {
         case READER_PROCESS_READ:
@@ -88,25 +121,37 @@ void loop()
             {
                 fault_sensor = READER_PROCESS_CASE1;
                 reader_process = READER_PROCESS_WAIT;
-                temp_currents = sensor_currents;
+                #ifdef DEBUG_SENSOR_SYSTEM
+                    Serial.println("Entering Case 1");
+                #endif
             }
-            else if(sensor_currents.bus22 > SENSOR_OVERLOAD)
+            else if(sensor_currents.bus22 > SENSOR_OVERLOAD/2)
             {
                 fault_sensor = READER_PROCESS_CASE2;
                 reader_process = READER_PROCESS_WAIT;
-                temp_currents = sensor_currents;
+                #ifdef DEBUG_SENSOR_SYSTEM
+                    Serial.println("Entering Case 2");
+                #endif
             }
             else if(sensor_currents.bus24 > SENSOR_OVERLOAD)
             {
                 fault_sensor = READER_PROCESS_CASE3;
                 reader_process = READER_PROCESS_WAIT;
-                temp_currents = sensor_currents;
+                #ifdef DEBUG_SENSOR_SYSTEM
+                    Serial.println("Entering Case 3");
+                #endif
             }
             
-            wait_time = 1000;
+            wait_time = 500;
             if(current_time - last_time > wait_time)
             {
                 output_currents = sensor_currents;
+                if(sensor_currents.bus87 > 0.01) output_currents.bus87  = 72.0 + getRandomVal();
+                if(sensor_currents.bus14 > 0.01) output_currents.bus14  = 44.0 + getRandomVal();
+                if(sensor_currents.bus16 > 0.01) output_currents.bus16  = 35.0 + getRandomVal();
+                if(sensor_currents.bus22 > 0.01) output_currents.bus22  = 22.0 + getRandomVal();
+                if(sensor_currents.bus24 > 0.01) output_currents.bus24  = 15.0 + getRandomVal();
+                temp_currents = output_currents;;
                 Process_SendCurrents();
                 last_time = current_time;
             }
@@ -117,71 +162,26 @@ void loop()
         {
             if(sensor_currents.bus87 <= SENSOR_UNDERLOAD)
             {
-                reader_process = fault_sensor;
-                fault_process = FAULT_PROCESS_INIT;
+                #ifdef DEBUG_SENSOR_SYSTEM
+                    Serial.print("Entering Next ");
+                    Serial.println(fault_sensor);
+                #endif
+                Process_HandleCase(fault_sensor);
+                // reader_process = fault_sensor;
+                reader_process = READER_PROCESS_DONE;
             }
 
-            wait_time = 1000;
-            if(current_time - last_time < wait_time)
+            wait_time = 500;
+            if(current_time - last_time > wait_time)
             {
-                output_currents.bus87  = temp_currents.bus87 + getRandomVal();
-                output_currents.bus14  = temp_currents.bus14 + getRandomVal();
-                output_currents.bus16  = temp_currents.bus16 + getRandomVal();
-                output_currents.bus22  = temp_currents.bus22 + getRandomVal();
-                output_currents.bus24  = temp_currents.bus24 + getRandomVal();
+                if(sensor_currents.bus87 > 0.01) output_currents.bus87  = 72.0 + getRandomVal();
+                if(sensor_currents.bus14 > 0.01) output_currents.bus14  = 44.0 + getRandomVal();
+                if(sensor_currents.bus16 > 0.01) output_currents.bus16  = 35.0 + getRandomVal();
+                if(sensor_currents.bus22 > 0.01) output_currents.bus22  = 22.0 + getRandomVal();
+                if(sensor_currents.bus24 > 0.01) output_currents.bus24  = 15.0 + getRandomVal();
                 Process_SendCurrents();
                 last_time = current_time;
             }
-            reader_process = fault_sensor; //wait for lines to fall and move to exact case
-        }
-        break;
-
-        case READER_PROCESS_CASE1:
-        {
-            output_currents.bus87 = sensor_currents.bus87;
-            switch(fault_process)
-            {
-                case FAULT_PROCESS_INIT:
-                {
-                    if(sensor_currents.bus14 > SENSOR_OVERLOAD)
-                    {
-                        fault_process = FAULT_PROCESS_SPIKE;
-                    }
-                }
-                break;
-
-                case FAULT_PROCESS_SPIKE:
-                {
-                    if(sensor_currents.bus14 < SENSOR_UNDERLOAD)
-                    {
-                        fault_process = FAULT_PROCESS_DROP;
-                    }
-                }
-                break;
-
-                case FAULT_PROCESS_DROP:
-                {
-                    if(sensor_currents.bus14 > SENSOR_OVERLOAD)
-                    {
-                        fault_process = FAULT_PROCESS_INIT;
-                    }
-                }
-                break;
-            }
-        }
-        break;
-
-        case READER_PROCESS_CASE2:
-        {
-            output_currents.bus14 = sensor_currents.bus14;
-            reader_process = READER_PROCESS_CASE3;
-        }
-        break;
-
-        case READER_PROCESS_CASE3:
-        {
-            output_currents.bus16 = sensor_currents.bus16;
-            reader_process = READER_PROCESS_DONE;
         }
         break;
 
@@ -193,6 +193,7 @@ void loop()
         }
         break;
     }
+
 }
 
 /* ----------------------------------- EOF ---------------------------------- */

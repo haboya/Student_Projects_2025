@@ -46,6 +46,7 @@ export class SerialService extends EventEmitter {
     }
 
     private parseSensorData(data: string): SensorData | null {
+        console.log(data);
         const values = data.split(',').map(Number);
         if (values.length === 5) {
             const dt = new Date();

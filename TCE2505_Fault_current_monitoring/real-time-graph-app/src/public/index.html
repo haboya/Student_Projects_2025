@@ -13,6 +13,7 @@
             <h1>
                 FAULT CURRENT MONITORING
                 <button id="pause-btn" onclick="toggleChartUpdate()">Pause</button>
+                <button id="download-btn" onclick="downloadData()">Download Data</button>
             </h1>
             <canvas id="sensorGraph" width="800" height="400"></canvas>
         </div>
@@ -37,7 +38,7 @@
                 </div>
                 <div class="column">
                     <div class="card">
-                        <h3 style="padding-top: 20px;">Bus Relay-87</h3>
+                        <h3 style="padding-top: 20px;">BUS Relay-87 @Bus 15</h3>
                         <label class="switch">
                             <input type="checkbox" id="relay2-state" disabled>
                             <span class="slider round"></span>
@@ -49,7 +50,7 @@
                 </div>
                 <div class="column">
                     <div class="card">
-                        <h3 style="padding-top: 20px;">OCR @Bus 16</h3>
+                        <h3 style="padding-top: 20px;">OCR-51 @Bus 16</h3>
                         <label class="switch">
                             <input type="checkbox" id="relay3-state" disabled>
                             <span class="slider round"></span>
@@ -63,7 +64,7 @@
             <div class="row">
                 <div class="column">
                     <div class="card">
-                        <h3 style="padding-top: 20px;">OCR @Bus 22</h3>
+                        <h3 style="padding-top: 20px;">OCR-51 @Bus 22</h3>
                         <label class="switch">
                             <input type="checkbox" id="relay4-state" disabled>
                             <span class="slider round"></span>
@@ -75,7 +76,7 @@
                 </div>
                 <div class="column">
                     <div class="card">
-                        <h3 style="padding-top: 20px;">OCR @Bus 24</h3>
+                        <h3 style="padding-top: 20px;">OCR-51 @Bus 24</h3>
                         <label class="switch">
                             <input type="checkbox" id="relay5-state" disabled>
                             <span class="slider round"></span>

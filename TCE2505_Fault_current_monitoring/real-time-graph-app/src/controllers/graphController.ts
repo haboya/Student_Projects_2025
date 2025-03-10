@@ -8,7 +8,7 @@ export class GraphController {
 
     constructor(io: Server) {
         this.io = io;
-        this.serialService = new SerialService("COM4");
+        this.serialService = new SerialService("COM2");
         
         // Add listener for serial data
         this.serialService.on('data', (data) => {

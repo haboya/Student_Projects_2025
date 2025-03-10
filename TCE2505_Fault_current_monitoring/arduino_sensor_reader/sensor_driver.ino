@@ -78,6 +78,7 @@ bool Sensors_Init( void )
                     #endif
                     return false;
                 }
+                sensor_bus87.threshold = 18.1;
                 break;
             }
 
@@ -90,6 +91,7 @@ bool Sensors_Init( void )
                     #endif
                     return false;
                 }
+                sensor_bus14.threshold = 14.6;
                 break;
             }
 
@@ -102,6 +104,7 @@ bool Sensors_Init( void )
                     #endif
                     return false;
                 }
+                sensor_bus16.threshold = 17.7;
                 break;
             }
 
@@ -114,6 +117,7 @@ bool Sensors_Init( void )
                     #endif
                     return false;
                 }
+                sensor_bus22.threshold = 14.1;
                 break;
             }
 
@@ -126,6 +130,7 @@ bool Sensors_Init( void )
                     #endif
                     return false;
                 }
+                sensor_bus24.threshold = 18.7;
                 break;
             }
 
@@ -191,4 +196,16 @@ void Sensors_Read( void )
     }
 
     sensor_index = (sensor_index + 1) % SENSOR_COUNT;
+    
+    // #ifdef DEBUG_SENSOR_SYSTEM
+    //     if(sensor_index == 0)
+    //     {
+    //         Serial.println("Current Values: ");
+    //         Serial.print(sensor_currents.bus87); Serial.print(",");
+    //         Serial.print(sensor_currents.bus14); Serial.print(",");
+    //         Serial.print(sensor_currents.bus16); Serial.print(",");
+    //         Serial.print(sensor_currents.bus22); Serial.print(",");
+    //         Serial.print(sensor_currents.bus24); Serial.print("\n");
+    //     }
+    // #endif
 }

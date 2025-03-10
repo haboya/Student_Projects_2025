@@ -2,10 +2,10 @@
 #ifndef ARDUINO_SENSOR_CONFIG_H
     #define ARDUINO_SENSOR_CONFIG_H
 
-    #define DEBUG_SENSOR_SYSTEM
-    #define CALIBRATION_THRESHOLD   1.35
-    #define SENSOR_OVERLOAD         7.1
-    #define SENSOR_UNDERLOAD        0.0
+    // #define DEBUG_SENSOR_SYSTEM
+    #define CALIBRATION_THRESHOLD   1.65
+    #define SENSOR_OVERLOAD         10.1
+    #define SENSOR_UNDERLOAD        2.0
     #define SENSOR_SAMPLES          20
     #define SENSOR_COUNT            5
     #define SENSOR_BUS87_PIN        A1
@@ -20,6 +20,7 @@
         int max_val[SENSOR_SAMPLES];
         int old_val;
         float IRMS;
+        float threshold;
     }
     CURRENT_SESNOR;
     typedef struct SENSOR_CURRENTS
