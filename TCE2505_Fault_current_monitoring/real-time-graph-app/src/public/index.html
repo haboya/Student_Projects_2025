@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fault Current Monitoring</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="chart-container animate" id="chart-container">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeChartView()">&times;</a>
+            <h1>
+                FAULT CURRENT MONITORING
+                <button id="pause-btn" onclick="toggleChartUpdate()">Pause</button>
+                <button id="download-btn" onclick="downloadData()">Download Data</button>
+            </h1>
+            <canvas id="sensorGraph" width="800" height="400"></canvas>
+        </div>
+
+        <div class="sensor-values" id="raw-values">
+            <span class="closebtn" style="font-size:20px;cursor:pointer" onclick="openChartView()">&#9776; Open Graph</span>
+            <h1 style="text-align: center;">
+                FAULT CURRENT MONITORING
+            </h1>
+            <div class="row">
+                <div class="column">
+                    <div class="card">
+                        <h3 style="padding-top: 20px;">Diff Relay 87 @Bus 14</h3>
+                        <label class="switch">
+                            <input type="checkbox" id="relay1-state" disabled>
+                            <span class="slider round"></span>
+                        </label>
+                        <h4 id="relay1-value">
+                            0.0 A
+                        </h4>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="card">
+                        <h3 style="padding-top: 20px;">BUS Relay-87 @Bus 15</h3>
+                        <label class="switch">
+                            <input type="checkbox" id="relay2-state" disabled>
+                            <span class="slider round"></span>
+                        </label>
+                        <h4 id="relay2-value">
+                            0.0 A
+                        </h4>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="card">
+                        <h3 style="padding-top: 20px;">OCR-51 @Bus 16</h3>
+                        <label class="switch">
+                            <input type="checkbox" id="relay3-state" disabled>
+                            <span class="slider round"></span>
+                        </label>
+                        <h4 id="relay3-value">
+                            0.0 A
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="column">
+                    <div class="card">
+                        <h3 style="padding-top: 20px;">OCR-51 @Bus 22</h3>
+                        <label class="switch">
+                            <input type="checkbox" id="relay4-state" disabled>
+                            <span class="slider round"></span>
+                        </label>
+                        <h4 id="relay4-value">
+                            0.0 A
+                        </h4>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="card">
+                        <h3 style="padding-top: 20px;">OCR-51 @Bus 24</h3>
+                        <label class="switch">
+                            <input type="checkbox" id="relay5-state" disabled>
+                            <span class="slider round"></span>
+                        </label>
+                        <h4 id="relay5-value">
+                            0.0 A
+                        </h4>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="card">
+                        <h3 style="padding-top: 20px;">RELAY ___</h3>
+                        <label class="switch">
+                            <input type="checkbox" id="relay6-state" disabled>
+                            <span class="slider round"></span>
+                        </label>
+                        <h4 id="relay6-value">
+                            0.0 A
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="chart.js"></script>
+    <script src="chartjs-adapter-date-fns.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="scripts.js"></script>
+</body>
+</html>
