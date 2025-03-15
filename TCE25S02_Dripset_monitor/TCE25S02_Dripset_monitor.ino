@@ -6,13 +6,15 @@
 #include <BlynkSimpleEsp8266.h>
 
 #include "dripset_monitor_config.h"
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
 
 #define DEBUG_DEVICE_SATES 
-#define MOTOR_PIN                   D7
+#define MOTOR_PIN                   D5
 #define BUZZER_PIN                  D7
 #define INFRARED_PIN                D6
-#define LOAD_CELL_SCK_PIN           D2
-#define LOAD_CELL_SDA_PIN           D1
+#define LOAD_CELL_SCK_PIN           D3
+#define LOAD_CELL_SDA_PIN           D4
 #define NOTIFICATION_INTERVAL_SECS  1
 
 #define CUTOFF_VOLUME               100
@@ -26,6 +28,8 @@ SENSOR_STATES sensor_state;
 /// @brief Iot Connection stuff moved here due to compiler conflicts failing to compile
 const char* ssid = "PowerUPLab";
 const char* password = "#powerup2"; 
+
+LiquidCrystal_I2C lcd(0x27,16,2);
 
 BlynkTimer timer;
 
@@ -108,6 +112,11 @@ void setup()
 {
     Serial.begin(115200);
 
+    lcd.init();
+    lcd.backlight();
+    lcd.setCursor(0,0);
+    lcd.print("INNITIALIZING....");
+
     //reset all variable parameters
     dripset_params.cutoff_volume = CUTOFF_VOLUME;
     dripset_params.minimum_flow_rate = MINIMUM_FLOW_RATE;
@@ -161,7 +170,7 @@ void loop()
         {
             motor_OpenFlow();
             dripset_params.drip_running = false;
-            beepBuzzer(20);
+            beepBuzzer(5);
             if(dripset_params.drip_flow_rate > 0)
             {
                 setDripState(DRIP_STATE_DRIPPING);
@@ -185,7 +194,7 @@ void loop()
                 setDripState(DRIP_STATE_STOPPED);
             }
 
-            beepBuzzer(8);
+            beepBuzzer(3);
             break;
         }
 
@@ -193,7 +202,7 @@ void loop()
         {
             motor_CloseFlow();
             dripset_params.drip_running = false;
-            beepBuzzer(2);
+            beepBuzzer(4);
             break;
         }
 
@@ -205,7 +214,7 @@ void loop()
             {
                 setDripState(DRIP_STATE_OFF);
             }
-            beepBuzzer(1);
+            beepBuzzer(2);
             break;
         }
     }
